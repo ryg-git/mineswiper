@@ -16,6 +16,7 @@ class Position with _$Position {
     @Default(false) bool isMine,
     @Default(false) bool isFlagged,
     @Default(false) bool isVisited,
+    @Default(false) bool isDefused,
   }) = _Position;
 
   bool isNearTile(Position other) {

@@ -26,6 +26,35 @@ class MinePuzzleTile extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    Widget getLetter() {
+      if (tile.position.isFlagged) {
+        return const Text(
+          'F',
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        );
+      } else if (tile.position.isVisited) {
+        if (tile.position.isMine) {
+          return const Text(
+            'M',
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          );
+        } else {
+          return Text(
+            '${tile.position.mines}',
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          );
+        }
+      } else {
+        return const Text("");
+      }
+    }
+
     return TextButton(
       style: TextButton.styleFrom(
         primary: PuzzleColors.white,
@@ -50,21 +79,10 @@ class MinePuzzleTile extends HookConsumerWidget {
           ref.read(puzzleProvider.notifier).moveTiles(tile, []);
         }
       },
-      child: tile.position.isVisited
-          ? tile.position.isMine
-              ? Text(
-                  'M',
-                  style: TextStyle(
-                    color: Colors.black,
-                  ),
-                )
-              : Text(
-                  '${tile.position.mines}',
-                  style: TextStyle(
-                    color: Colors.black,
-                  ),
-                )
-          : const Text(''),
+      onLongPress: () {
+        ref.read(puzzleProvider.notifier).flagTile(tile);
+      },
+      child: getLetter(),
     );
   }
 }

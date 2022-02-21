@@ -24,7 +24,8 @@ class _$PositionTearOff {
       int mines = 4,
       bool isMine = false,
       bool isFlagged = false,
-      bool isVisited = false}) {
+      bool isVisited = false,
+      bool isDefused = false}) {
     return _Position(
       x: x,
       y: y,
@@ -32,6 +33,7 @@ class _$PositionTearOff {
       isMine: isMine,
       isFlagged: isFlagged,
       isVisited: isVisited,
+      isDefused: isDefused,
     );
   }
 }
@@ -47,6 +49,7 @@ mixin _$Position {
   bool get isMine => throw _privateConstructorUsedError;
   bool get isFlagged => throw _privateConstructorUsedError;
   bool get isVisited => throw _privateConstructorUsedError;
+  bool get isDefused => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $PositionCopyWith<Position> get copyWith =>
@@ -58,7 +61,13 @@ abstract class $PositionCopyWith<$Res> {
   factory $PositionCopyWith(Position value, $Res Function(Position) then) =
       _$PositionCopyWithImpl<$Res>;
   $Res call(
-      {int x, int y, int mines, bool isMine, bool isFlagged, bool isVisited});
+      {int x,
+      int y,
+      int mines,
+      bool isMine,
+      bool isFlagged,
+      bool isVisited,
+      bool isDefused});
 }
 
 /// @nodoc
@@ -77,6 +86,7 @@ class _$PositionCopyWithImpl<$Res> implements $PositionCopyWith<$Res> {
     Object? isMine = freezed,
     Object? isFlagged = freezed,
     Object? isVisited = freezed,
+    Object? isDefused = freezed,
   }) {
     return _then(_value.copyWith(
       x: x == freezed
@@ -103,6 +113,10 @@ class _$PositionCopyWithImpl<$Res> implements $PositionCopyWith<$Res> {
           ? _value.isVisited
           : isVisited // ignore: cast_nullable_to_non_nullable
               as bool,
+      isDefused: isDefused == freezed
+          ? _value.isDefused
+          : isDefused // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -113,7 +127,13 @@ abstract class _$PositionCopyWith<$Res> implements $PositionCopyWith<$Res> {
       __$PositionCopyWithImpl<$Res>;
   @override
   $Res call(
-      {int x, int y, int mines, bool isMine, bool isFlagged, bool isVisited});
+      {int x,
+      int y,
+      int mines,
+      bool isMine,
+      bool isFlagged,
+      bool isVisited,
+      bool isDefused});
 }
 
 /// @nodoc
@@ -133,6 +153,7 @@ class __$PositionCopyWithImpl<$Res> extends _$PositionCopyWithImpl<$Res>
     Object? isMine = freezed,
     Object? isFlagged = freezed,
     Object? isVisited = freezed,
+    Object? isDefused = freezed,
   }) {
     return _then(_Position(
       x: x == freezed
@@ -159,6 +180,10 @@ class __$PositionCopyWithImpl<$Res> extends _$PositionCopyWithImpl<$Res>
           ? _value.isVisited
           : isVisited // ignore: cast_nullable_to_non_nullable
               as bool,
+      isDefused: isDefused == freezed
+          ? _value.isDefused
+          : isDefused // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -172,7 +197,8 @@ class _$_Position extends _Position with DiagnosticableTreeMixin {
       this.mines = 4,
       this.isMine = false,
       this.isFlagged = false,
-      this.isVisited = false})
+      this.isVisited = false,
+      this.isDefused = false})
       : super._();
 
   @override
@@ -191,10 +217,13 @@ class _$_Position extends _Position with DiagnosticableTreeMixin {
   @JsonKey()
   @override
   final bool isVisited;
+  @JsonKey()
+  @override
+  final bool isDefused;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Position(x: $x, y: $y, mines: $mines, isMine: $isMine, isFlagged: $isFlagged, isVisited: $isVisited)';
+    return 'Position(x: $x, y: $y, mines: $mines, isMine: $isMine, isFlagged: $isFlagged, isVisited: $isVisited, isDefused: $isDefused)';
   }
 
   @override
@@ -207,7 +236,8 @@ class _$_Position extends _Position with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('mines', mines))
       ..add(DiagnosticsProperty('isMine', isMine))
       ..add(DiagnosticsProperty('isFlagged', isFlagged))
-      ..add(DiagnosticsProperty('isVisited', isVisited));
+      ..add(DiagnosticsProperty('isVisited', isVisited))
+      ..add(DiagnosticsProperty('isDefused', isDefused));
   }
 
   @override
@@ -220,7 +250,8 @@ class _$_Position extends _Position with DiagnosticableTreeMixin {
             const DeepCollectionEquality().equals(other.mines, mines) &&
             const DeepCollectionEquality().equals(other.isMine, isMine) &&
             const DeepCollectionEquality().equals(other.isFlagged, isFlagged) &&
-            const DeepCollectionEquality().equals(other.isVisited, isVisited));
+            const DeepCollectionEquality().equals(other.isVisited, isVisited) &&
+            const DeepCollectionEquality().equals(other.isDefused, isDefused));
   }
 
   @override
@@ -231,7 +262,8 @@ class _$_Position extends _Position with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(mines),
       const DeepCollectionEquality().hash(isMine),
       const DeepCollectionEquality().hash(isFlagged),
-      const DeepCollectionEquality().hash(isVisited));
+      const DeepCollectionEquality().hash(isVisited),
+      const DeepCollectionEquality().hash(isDefused));
 
   @JsonKey(ignore: true)
   @override
@@ -246,7 +278,8 @@ abstract class _Position extends Position {
       int mines,
       bool isMine,
       bool isFlagged,
-      bool isVisited}) = _$_Position;
+      bool isVisited,
+      bool isDefused}) = _$_Position;
   const _Position._() : super._();
 
   @override
@@ -261,6 +294,8 @@ abstract class _Position extends Position {
   bool get isFlagged;
   @override
   bool get isVisited;
+  @override
+  bool get isDefused;
   @override
   @JsonKey(ignore: true)
   _$PositionCopyWith<_Position> get copyWith =>
