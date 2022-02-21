@@ -15,6 +15,8 @@ class Puzzle with _$Puzzle {
     required List<Tile> tiles,
     @Default(0) int rowSize,
     @Default(0) int colSize,
+    @Default(false) bool whiteSpaceCreated,
+    @Default(false) bool solved,
   }) = _Puzzle;
 
   Tile getWhitespaceTile() {

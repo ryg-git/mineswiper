@@ -25,22 +25,36 @@ class MineOpenTile extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    Widget getLetter() {
+      if (tile.position.isFlagged) {
+        return Text(
+          'F',
+          style: PuzzleTextStyle.headline2.copyWith(
+            fontSize: tileFontSize,
+            color: PuzzleColors.white,
+          ),
+        );
+      } else if (tile.position.isMine) {
+        return Text(
+          'M',
+          style: PuzzleTextStyle.headline2.copyWith(
+            fontSize: tileFontSize,
+            color: PuzzleColors.white,
+          ),
+        );
+      } else {
+        return Text(
+          '${tile.position.mines}',
+          style: PuzzleTextStyle.headline2.copyWith(
+            fontSize: tileFontSize,
+            color: PuzzleColors.white,
+          ),
+        );
+      }
+    }
+
     return Center(
-      child: tile.position.isMine
-          ? Text(
-              'M',
-              style: PuzzleTextStyle.headline2.copyWith(
-                fontSize: tileFontSize,
-                color: PuzzleColors.black,
-              ),
-            )
-          : Text(
-              '${tile.position.mines}',
-              style: PuzzleTextStyle.headline2.copyWith(
-                fontSize: tileFontSize,
-                color: PuzzleColors.white,
-              ),
-            ),
+      child: getLetter(),
     );
   }
 }

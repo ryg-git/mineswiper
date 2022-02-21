@@ -15,7 +15,15 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
   PuzzleNotifier() : super(Puzzle(tiles: []));
 
   Tile getWhitespaceTile() {
-    return state.tiles.singleWhere((tile) => tile.isWhiteSpace);
+    return state.tiles.singleWhere(
+      (tile) => tile.isWhiteSpace,
+      orElse: () => Tile(
+        position: Position(
+          x: 20,
+          y: 20,
+        ),
+      ),
+    );
   }
 
   bool isTileMovable(Tile tile) {
@@ -29,6 +37,58 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
       return false;
     }
     return true;
+  }
+
+  void createWhiteSpace(Tile tile) {
+    final newMines = state.tiles.fold<List<Tile>>([], (previousValue, element) {
+      if (element.position.isNearTile(tile.position)) {
+        return previousValue..add(element);
+      } else {
+        return previousValue;
+      }
+    });
+
+    state = state.copyWith(
+      tiles: state.tiles.map((e) {
+        final nearMine = newMines.fold<int>(0, (acc, ele) {
+          if (ele.position.isNearTile(e.position)) {
+            return acc++;
+          } else {
+            return acc;
+          }
+        });
+        if (e == tile) {
+          return e.copyWith(
+            isWhiteSpace: true,
+          );
+        } else if (nearMine > 0) {
+          return e.copyWith(
+            position: e.position.copyWith(
+              mines: e.position.mines - nearMine,
+            ),
+          );
+        } else {
+          return e;
+        }
+      }).toList(),
+      whiteSpaceCreated: true,
+    );
+  }
+
+  void flagTile(Tile tile) {
+    state = state.copyWith(
+      tiles: state.tiles.map((e) {
+        if (e == tile) {
+          return e.copyWith(
+            position: e.position.copyWith(
+              isFlagged: true,
+            ),
+          );
+        } else {
+          return e;
+        }
+      }).toList(),
+    );
   }
 
   void moveTiles(Tile tile, List<Tile> tilesToSwap) {
@@ -71,7 +131,7 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
       );
     }
 
-    state = Puzzle(tiles: state.tiles);
+    state = state.copyWith(tiles: state.tiles);
   }
 
   void createPuzzle(int size) {
@@ -119,27 +179,25 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
         }
       },
     ).toList();
-    // ..sort(
-    //   (a, b) => (a.x * size + a.y).compareTo(b.x * size + b.y),
-    // );
 
     final tiles = _getMineAndTiles(
       minesTiles,
-      minesTiles[0],
     );
 
-    state = Puzzle(tiles: tiles);
+    state = Puzzle(
+      tiles: tiles,
+      rowSize: size,
+      colSize: size,
+      solved: false,
+      whiteSpaceCreated: false,
+    );
   }
 
-  List<Tile> _getMineAndTiles(
-    List<Position> correctPositions,
-    Position whiteSpace,
-  ) {
+  List<Tile> _getMineAndTiles(List<Position> correctPositions) {
     return correctPositions.map(
       (e) {
         return Tile(
           position: e,
-          isWhiteSpace: e == whiteSpace,
         );
       },
     ).toList();

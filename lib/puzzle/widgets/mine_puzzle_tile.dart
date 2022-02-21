@@ -75,8 +75,12 @@ class MinePuzzleTile extends HookConsumerWidget {
         ),
       ),
       onPressed: () {
-        if (ref.read(puzzleProvider).isTileMovable(tile)) {
-          ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+        if (ref.read(puzzleProvider).whiteSpaceCreated) {
+          if (ref.read(puzzleProvider).isTileMovable(tile)) {
+            ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+          }
+        } else {
+          ref.read(puzzleProvider.notifier).createWhiteSpace(tile);
         }
       },
       onLongPress: () {
