@@ -90,9 +90,10 @@ class PuzzleBoard extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final puzzleState = ref.watch(puzzleStateProvider);
-    final puzzleLayout = ref.watch(puzzleLayoutProvider);
-    final size = puzzleState.puzzle.getDimension();
+    final puzzleLayout = ref.read(puzzleLayoutProvider);
+    final size = ref.read(puzzleSizeProvider);
+    final puzzleState = ref.read(puzzleStateProvider);
+
     if (size == 0) return const CircularProgressIndicator();
     return InteractiveViewer(
       panEnabled: false, // Set it to false to prevent panning.
@@ -103,16 +104,16 @@ class PuzzleBoard extends HookConsumerWidget {
         alignment: Alignment.center,
         children: [
           puzzleLayout.boardBuilder(
-      size,
-      puzzleState.puzzle.tiles
-          .map(
-            (tile) => _PuzzleTile(
-              key: Key('puzzle_tile_${tile.position.toString()}'),
+            size,
+            puzzleState.puzzle.tiles
+                .map(
+                  (tile) => _PuzzleTile(
+                    key: Key('puzzle_tile_${tile.position.toString()}'),
                     x: tile.position.x,
                     y: tile.position.y,
-            ),
-          )
-          .toList(),
+                  ),
+                )
+                .toList(),
           ),
           _ShowMessage(),
         ],
@@ -124,8 +125,27 @@ class PuzzleBoard extends HookConsumerWidget {
 class _PuzzleTile extends HookConsumerWidget {
   const _PuzzleTile({
     Key? key,
-    required this.tile,
+    required this.x,
+    required this.y,
   }) : super(key: key);
+
+  final int x;
+  final int y;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final puzzleLayout = ref.read(puzzleLayoutProvider);
+    final puzzleState = ref.read(puzzleStateProvider);
+    final size = ref.read(puzzleSizeProvider);
+    final currentTile = puzzleState.puzzle.tiles[x * size + y];
+    final tile = ref.watch(positionTileProvider(
+        "${currentTile.position.x}-${currentTile.position.y}"));
+
+    return tile.isWhiteSpace
+        ? puzzleLayout.whitespaceTileBuilder(currentTile, puzzleState)
+        : puzzleLayout.tileBuilder(currentTile, puzzleState);
+  }
+}
 
 class _ShowMessage extends HookConsumerWidget {
   const _ShowMessage({

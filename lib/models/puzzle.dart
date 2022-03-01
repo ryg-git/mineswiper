@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:mineswiper/models/position.dart';
 
 import 'tile.dart';
 
@@ -19,24 +20,19 @@ class Puzzle with _$Puzzle {
     @Default(false) bool solved,
   }) = _Puzzle;
 
-  Tile getWhitespaceTile() {
-    return tiles.singleWhere((tile) => tile.isWhiteSpace);
-  }
-
-  bool isTileMovable(Tile tile) {
-    final whitespaceTile = getWhitespaceTile();
-    if (tile == whitespaceTile) {
-      return false;
-    }
-
-    if (whitespaceTile.position.x != tile.position.x &&
-        whitespaceTile.position.y != tile.position.y) {
-      return false;
-    }
-    return true;
-  }
-
   int getDimension() {
     return sqrt(tiles.length).toInt();
+  }
+
+  Tile getWhitespaceTile() {
+    return tiles.singleWhere(
+      (tile) => tile.isWhiteSpace,
+      orElse: () => Tile(
+        position: Position(
+          x: 20,
+          y: 20,
+        ),
+      ),
+    );
   }
 }

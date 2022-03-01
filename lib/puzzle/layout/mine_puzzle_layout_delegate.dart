@@ -97,33 +97,33 @@ class MinePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
           alignment: Alignment.center,
           children: [
             ResponsiveLayoutBuilder(
-            small: (_, __) => SizedBox.square(
-              dimension: _BoardSize.small,
-              child: PuzzleBoard(
-                key: const Key('simple_puzzle_board_small'),
-                size: size,
-                tiles: tiles,
-                spacing: 5,
+              small: (_, __) => SizedBox.square(
+                dimension: _BoardSize.small,
+                child: PuzzleBoard(
+                  key: const Key('simple_puzzle_board_small'),
+                  size: size,
+                  tiles: tiles,
+                  spacing: 5,
+                ),
               ),
-            ),
-            medium: (_, __) => SizedBox.square(
-              dimension: _BoardSize.medium,
-              child: PuzzleBoard(
-                key: const Key('simple_puzzle_board_medium'),
-                size: size,
-                tiles: tiles,
+              medium: (_, __) => SizedBox.square(
+                dimension: _BoardSize.medium,
+                child: PuzzleBoard(
+                  key: const Key('simple_puzzle_board_medium'),
+                  size: size,
+                  tiles: tiles,
+                ),
               ),
-            ),
-            large: (_, __) => SizedBox.square(
-              dimension: _BoardSize.large,
-              child: PuzzleBoard(
-                key: const Key('simple_puzzle_board_large'),
-                size: size,
-                tiles: tiles,
+              large: (_, __) => SizedBox.square(
+                dimension: _BoardSize.large,
+                child: PuzzleBoard(
+                  key: const Key('simple_puzzle_board_large'),
+                  size: size,
+                  tiles: tiles,
                   spacing: 30 / size,
+                ),
               ),
             ),
-          ),
           ],
         ),
         const ResponsiveGap(
