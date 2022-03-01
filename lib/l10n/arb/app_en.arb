@@ -4,5 +4,9 @@
     "counterAppBarTitle": "Counter",
     "@counterAppBarTitle": {
         "description": "Text shown in the AppBar of the Counter Page"
+    },
+    "tapTile": "Tap any tile (prefer tapping in center)",
+    "@tapTile": {
+        "description": "Initial tap tile instruction"
     }
 }

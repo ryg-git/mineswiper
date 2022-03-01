@@ -126,16 +126,30 @@ class _PuzzleTile extends HookConsumerWidget {
     required this.tile,
   }) : super(key: key);
 
-  /// The tile to be displayed.
-  final Tile tile;
+class _ShowMessage extends HookConsumerWidget {
+  const _ShowMessage({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final puzzleState = ref.watch(puzzleStateProvider);
-    final puzzleLayout = ref.watch(puzzleLayoutProvider);
+    final l10n = context.l10n;
 
-    return tile.isWhiteSpace
-        ? puzzleLayout.whitespaceTileBuilder(tile, puzzleState)
-        : puzzleLayout.tileBuilder(tile, puzzleState);
+    return puzzleState.puzzle.whiteSpaceCreated
+        ? SizedBox()
+        : fui.FluentTheme(
+            data: fui.ThemeData(
+              visualDensity: VisualDensity.standard,
+            ),
+            child: fui.Acrylic(
+              child: Center(
+                child: Text(
+                  l10n.tapTile,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          );
   }
 }
