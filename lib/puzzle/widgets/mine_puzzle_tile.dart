@@ -26,6 +26,7 @@ class MinePuzzleTile extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final size = ref.read(puzzleSizeProvider);
     Widget getLetter() {
       if (tile.position.isFlagged) {
         return const Text(
@@ -59,11 +60,11 @@ class MinePuzzleTile extends HookConsumerWidget {
       style: TextButton.styleFrom(
         primary: PuzzleColors.white,
         textStyle: PuzzleTextStyle.headline2.copyWith(
-          fontSize: tileFontSize,
+          fontSize: tileFontSize * 3 / size,
         ),
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
-            Radius.circular(12),
+            Radius.circular(36 / size),
           ),
         ),
       ).copyWith(
@@ -76,11 +77,11 @@ class MinePuzzleTile extends HookConsumerWidget {
       ),
       onPressed: () {
         if (ref.read(puzzleProvider).whiteSpaceCreated) {
-          if (ref.read(puzzleProvider).isTileMovable(tile)) {
+          if (ref.read(puzzleProvider.notifier).isTileMovable(tile)) {
             ref.read(puzzleProvider.notifier).moveTiles(tile, []);
           }
         } else {
-          ref.read(puzzleProvider.notifier).createWhiteSpace(tile);
+          ref.read(puzzleProvider.notifier).createWhiteSpace(tile, size);
         }
       },
       onLongPress: () {

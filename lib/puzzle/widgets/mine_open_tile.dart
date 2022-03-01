@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/colors/colors.dart';
 import 'package:mineswiper/models/puzzle_state.dart';
 import 'package:mineswiper/models/tile.dart';
+import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
 import 'package:mineswiper/styles/text_styles.dart';
 
 class MineOpenTile extends HookConsumerWidget {
@@ -25,20 +26,21 @@ class MineOpenTile extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final size = ref.read(puzzleSizeProvider);
     Widget getLetter() {
-      if (tile.position.isFlagged) {
-        return Text(
-          'F',
-          style: PuzzleTextStyle.headline2.copyWith(
-            fontSize: tileFontSize,
-            color: PuzzleColors.white,
-          ),
-        );
-      } else if (tile.position.isMine) {
+      if (tile.position.isMine) {
         return Text(
           'M',
           style: PuzzleTextStyle.headline2.copyWith(
-            fontSize: tileFontSize,
+            fontSize: tileFontSize * 3 / size,
+            color: PuzzleColors.white,
+          ),
+        );
+      } else if (tile.position.isFlagged) {
+        return Text(
+          '${tile.position.mines}',
+          style: PuzzleTextStyle.headline2.copyWith(
+            fontSize: tileFontSize * 3 / size,
             color: PuzzleColors.white,
           ),
         );
@@ -46,7 +48,7 @@ class MineOpenTile extends HookConsumerWidget {
         return Text(
           '${tile.position.mines}',
           style: PuzzleTextStyle.headline2.copyWith(
-            fontSize: tileFontSize,
+            fontSize: tileFontSize * 3 / size,
             color: PuzzleColors.white,
           ),
         );

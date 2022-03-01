@@ -85,6 +85,7 @@ class MinePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
 
   @override
   Widget boardBuilder(int size, List<Widget> tiles) {
+    // final double multi = 5 / size;
     return Column(
       children: [
         const ResponsiveGap(
@@ -92,8 +93,10 @@ class MinePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
           medium: 48,
           large: 96,
         ),
-        Center(
-          child: ResponsiveLayoutBuilder(
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            ResponsiveLayoutBuilder(
             small: (_, __) => SizedBox.square(
               dimension: _BoardSize.small,
               child: PuzzleBoard(
@@ -117,9 +120,11 @@ class MinePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
                 key: const Key('simple_puzzle_board_large'),
                 size: size,
                 tiles: tiles,
+                  spacing: 30 / size,
               ),
             ),
           ),
+          ],
         ),
         const ResponsiveGap(
           large: 96,
