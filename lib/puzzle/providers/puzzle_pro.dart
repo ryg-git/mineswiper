@@ -7,7 +7,7 @@ import 'package:mineswiper/models/puzzle_state.dart';
 import 'package:mineswiper/models/tile.dart';
 import 'package:mineswiper/puzzle/layout/mine_puzzle_layout_delegate.dart';
 
-final puzzleSizeProvider = StateProvider<int>((ref) => 40);
+final puzzleSizeProvider = StateProvider<int>((ref) => 8);
 
 final oddEvenProvider = StateProvider<bool>((ref) => random.nextBool());
 
@@ -156,10 +156,18 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
   void flagTile(Tile tile) {
     state = state.copyWith(
       tiles: state.tiles.map((e) {
-        if (e == tile) {
+        if (e.compareOnlyPosition(tile)) {
+          read(positionTileProvider(
+            "${tile.position.x}-${tile.position.y}",
+          ).notifier)
+              .state = tile.copyWith(
+            position: e.position.copyWith(
+              isFlagged: !e.position.isFlagged,
+            ),
+          );
           return e.copyWith(
             position: e.position.copyWith(
-              isFlagged: true,
+              isFlagged: !e.position.isFlagged,
             ),
           );
         } else {
@@ -175,16 +183,7 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
     final deltaX = whitespaceTile.position.x - tile.position.x;
     final deltaY = whitespaceTile.position.y - tile.position.y;
 
-    if ((deltaX.abs() + deltaY.abs()) > 1) {
-      final shiftPointX = tile.position.x + deltaX.sign;
-      final shiftPointY = tile.position.y + deltaY.sign;
-      final tileToSwapWith = state.tiles.singleWhere(
-        (tile) =>
-            tile.position.x == shiftPointX && tile.position.y == shiftPointY,
-      );
-      tilesToSwap.add(tile);
-      return moveTiles(tileToSwapWith, tilesToSwap);
-    } else {
+    if ((deltaX.abs() + deltaY.abs()) == 1) {
       tilesToSwap.add(tile);
       _swapTiles(tilesToSwap);
     }
@@ -193,22 +192,40 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
   void _swapTiles(List<Tile> tilesToSwap) {
     for (final tileToSwap in tilesToSwap.reversed) {
       final tileIndex = state.tiles.indexWhere(
-        (t) =>
-            t.position.x == tileToSwap.position.x &&
-            t.position.y == tileToSwap.position.y,
+        (t) => t.compareOnlyPosition(tileToSwap),
       );
       final tile = state.tiles[tileIndex];
       final whitespaceTile = getWhitespaceTile();
       final whitespaceTileIndex = state.tiles.indexWhere(
-        (t) =>
-            t.position.x == whitespaceTile.position.x &&
-            t.position.y == whitespaceTile.position.y,
+        (t) => t.compareOnlyPosition(whitespaceTile),
       );
 
       // Swap current board positions of the moving tile and the whitespace.
-      state.tiles[tileIndex] = tile.copyWith(
-        isWhiteSpace: true,
-      );
+
+      if (tile.position.isMine) {
+        if (tile.position.isFlagged) {
+          state.tiles[tileIndex] = tile.copyWith(
+            isWhiteSpace: true,
+            position: tile.position.copyWith(
+              isDefused: true,
+            ),
+          );
+        } else {
+          state = state.copyWith(
+            failed: true,
+          );
+        }
+      } else if (tile.position.isFlagged) {
+        if (!tile.position.isMine) {
+          state = state.copyWith(
+            failed: true,
+          );
+        }
+      } else {
+        state.tiles[tileIndex] = tile.copyWith(
+          isWhiteSpace: true,
+        );
+      }
 
       read(positionTileProvider(
         "${state.tiles[tileIndex].position.x}-${state.tiles[tileIndex].position.y}",

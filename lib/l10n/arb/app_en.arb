@@ -8,5 +8,13 @@
     "tapTile": "Tap any tile (prefer tapping in center)",
     "@tapTile": {
         "description": "Initial tap tile instruction"
+    },
+    "won": "Congrats you won!",
+    "@won": {
+        "description": "Game finished with the win"
+    },
+    "lost": "You lost",
+    "@lost": {
+        "description": "Game over"
     }
 }

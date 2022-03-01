@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/l10n/l10n.dart';
 import 'package:mineswiper/puzzle/layout/responsible_layout_builder.dart';
@@ -96,7 +97,7 @@ class PuzzleBoard extends HookConsumerWidget {
 
     if (size == 0) return const CircularProgressIndicator();
     return InteractiveViewer(
-      panEnabled: false, // Set it to false to prevent panning.
+      panEnabled: false,
       boundaryMargin: EdgeInsets.all(80),
       minScale: 0.5,
       maxScale: 8,
@@ -156,6 +157,37 @@ class _ShowMessage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final puzzleState = ref.watch(puzzleStateProvider);
     final l10n = context.l10n;
+    final isMounted = useIsMounted();
+
+    useEffect(
+      () {
+        Future.delayed(
+          Duration.zero,
+          () {
+            if (isMounted() && puzzleState.puzzle.failed) {
+              showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: Text(l10n.lost),
+                  content: Text(l10n.lost),
+                  actions: <Widget>[
+                    // TextButton(
+                    //   onPressed: () => Navigator.pop(context, 'Cancel'),
+                    //   child: const Text('Cancel'),
+                    // ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'OK'),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+            }
+          },
+        );
+        return;
+      },
+    );
 
     return puzzleState.puzzle.whiteSpaceCreated
         ? SizedBox()

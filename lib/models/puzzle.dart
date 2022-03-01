@@ -18,6 +18,7 @@ class Puzzle with _$Puzzle {
     @Default(0) int colSize,
     @Default(false) bool whiteSpaceCreated,
     @Default(false) bool solved,
+    @Default(false) bool failed,
   }) = _Puzzle;
 
   int getDimension() {

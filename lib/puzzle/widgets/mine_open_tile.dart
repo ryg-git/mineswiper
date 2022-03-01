@@ -32,7 +32,7 @@ class MineOpenTile extends HookConsumerWidget {
         return Text(
           'M',
           style: PuzzleTextStyle.headline2.copyWith(
-            fontSize: tileFontSize * 3 / size,
+            fontSize: tileFontSize * 2 / size,
             color: PuzzleColors.white,
           ),
         );
@@ -40,7 +40,7 @@ class MineOpenTile extends HookConsumerWidget {
         return Text(
           '${tile.position.mines}',
           style: PuzzleTextStyle.headline2.copyWith(
-            fontSize: tileFontSize * 3 / size,
+            fontSize: tileFontSize * 2 / size,
             color: PuzzleColors.white,
           ),
         );
@@ -48,7 +48,7 @@ class MineOpenTile extends HookConsumerWidget {
         return Text(
           '${tile.position.mines}',
           style: PuzzleTextStyle.headline2.copyWith(
-            fontSize: tileFontSize * 3 / size,
+            fontSize: tileFontSize * 2 / size,
             color: PuzzleColors.white,
           ),
         );

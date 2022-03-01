@@ -120,8 +120,9 @@ class __$TileCopyWithImpl<$Res> extends _$TileCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_Tile with DiagnosticableTreeMixin implements _Tile {
-  const _$_Tile({required this.position, this.isWhiteSpace = false});
+class _$_Tile extends _Tile with DiagnosticableTreeMixin {
+  const _$_Tile({required this.position, this.isWhiteSpace = false})
+      : super._();
 
   @override
   final Position position;
@@ -165,9 +166,10 @@ class _$_Tile with DiagnosticableTreeMixin implements _Tile {
       __$TileCopyWithImpl<_Tile>(this, _$identity);
 }
 
-abstract class _Tile implements Tile {
+abstract class _Tile extends Tile {
   const factory _Tile({required Position position, bool isWhiteSpace}) =
       _$_Tile;
+  const _Tile._() : super._();
 
   @override
   Position get position;

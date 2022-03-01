@@ -85,7 +85,9 @@ class MinePuzzleTile extends HookConsumerWidget {
         }
       },
       onLongPress: () {
-        ref.read(puzzleProvider.notifier).flagTile(tile);
+        if (ref.read(puzzleProvider).whiteSpaceCreated) {
+          ref.read(puzzleProvider.notifier).flagTile(tile);
+        }
       },
       child: getLetter(),
     );
