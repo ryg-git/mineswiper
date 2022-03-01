@@ -93,17 +93,29 @@ class PuzzleBoard extends HookConsumerWidget {
     final puzzleLayout = ref.watch(puzzleLayoutProvider);
     final size = puzzleState.puzzle.getDimension();
     if (size == 0) return const CircularProgressIndicator();
-
-    return puzzleLayout.boardBuilder(
+    return InteractiveViewer(
+      panEnabled: false, // Set it to false to prevent panning.
+      boundaryMargin: EdgeInsets.all(80),
+      minScale: 0.5,
+      maxScale: 8,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          puzzleLayout.boardBuilder(
       size,
       puzzleState.puzzle.tiles
           .map(
             (tile) => _PuzzleTile(
               key: Key('puzzle_tile_${tile.position.toString()}'),
-              tile: tile,
+                    x: tile.position.x,
+                    y: tile.position.y,
             ),
           )
           .toList(),
+          ),
+          _ShowMessage(),
+        ],
+      ),
     );
   }
 }
