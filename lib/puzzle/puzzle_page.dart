@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:mineswiper/models/tile.dart';
+import 'package:mineswiper/l10n/l10n.dart';
 import 'package:mineswiper/puzzle/layout/responsible_layout_builder.dart';
 import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
 import 'package:mineswiper/utils/theme.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fui;
 
 class PuzzlePage extends StatelessWidget {
   /// {@macro puzzle_page}
