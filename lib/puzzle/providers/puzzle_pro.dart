@@ -261,6 +261,10 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
             ),
           ),
         );
+        read(positionTileProvider(
+          "$x-$y",
+        ).notifier)
+            .state = correctPositions.last;
       }
     }
 
@@ -270,6 +274,7 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
       colSize: size,
       solved: false,
       whiteSpaceCreated: false,
+      reset: DateTime.now().millisecondsSinceEpoch,
     );
   }
 

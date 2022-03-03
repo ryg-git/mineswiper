@@ -24,7 +24,8 @@ class _$PuzzleTearOff {
       int colSize = 0,
       bool whiteSpaceCreated = false,
       bool solved = false,
-      bool failed = false}) {
+      bool failed = false,
+      int reset = 0}) {
     return _Puzzle(
       tiles: tiles,
       rowSize: rowSize,
@@ -32,6 +33,7 @@ class _$PuzzleTearOff {
       whiteSpaceCreated: whiteSpaceCreated,
       solved: solved,
       failed: failed,
+      reset: reset,
     );
   }
 }
@@ -47,6 +49,7 @@ mixin _$Puzzle {
   bool get whiteSpaceCreated => throw _privateConstructorUsedError;
   bool get solved => throw _privateConstructorUsedError;
   bool get failed => throw _privateConstructorUsedError;
+  int get reset => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $PuzzleCopyWith<Puzzle> get copyWith => throw _privateConstructorUsedError;
@@ -62,7 +65,8 @@ abstract class $PuzzleCopyWith<$Res> {
       int colSize,
       bool whiteSpaceCreated,
       bool solved,
-      bool failed});
+      bool failed,
+      int reset});
 }
 
 /// @nodoc
@@ -81,6 +85,7 @@ class _$PuzzleCopyWithImpl<$Res> implements $PuzzleCopyWith<$Res> {
     Object? whiteSpaceCreated = freezed,
     Object? solved = freezed,
     Object? failed = freezed,
+    Object? reset = freezed,
   }) {
     return _then(_value.copyWith(
       tiles: tiles == freezed
@@ -107,6 +112,10 @@ class _$PuzzleCopyWithImpl<$Res> implements $PuzzleCopyWith<$Res> {
           ? _value.failed
           : failed // ignore: cast_nullable_to_non_nullable
               as bool,
+      reset: reset == freezed
+          ? _value.reset
+          : reset // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -122,7 +131,8 @@ abstract class _$PuzzleCopyWith<$Res> implements $PuzzleCopyWith<$Res> {
       int colSize,
       bool whiteSpaceCreated,
       bool solved,
-      bool failed});
+      bool failed,
+      int reset});
 }
 
 /// @nodoc
@@ -142,6 +152,7 @@ class __$PuzzleCopyWithImpl<$Res> extends _$PuzzleCopyWithImpl<$Res>
     Object? whiteSpaceCreated = freezed,
     Object? solved = freezed,
     Object? failed = freezed,
+    Object? reset = freezed,
   }) {
     return _then(_Puzzle(
       tiles: tiles == freezed
@@ -168,6 +179,10 @@ class __$PuzzleCopyWithImpl<$Res> extends _$PuzzleCopyWithImpl<$Res>
           ? _value.failed
           : failed // ignore: cast_nullable_to_non_nullable
               as bool,
+      reset: reset == freezed
+          ? _value.reset
+          : reset // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -181,7 +196,8 @@ class _$_Puzzle extends _Puzzle with DiagnosticableTreeMixin {
       this.colSize = 0,
       this.whiteSpaceCreated = false,
       this.solved = false,
-      this.failed = false})
+      this.failed = false,
+      this.reset = 0})
       : super._();
 
   @override
@@ -201,10 +217,13 @@ class _$_Puzzle extends _Puzzle with DiagnosticableTreeMixin {
   @JsonKey()
   @override
   final bool failed;
+  @JsonKey()
+  @override
+  final int reset;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Puzzle(tiles: $tiles, rowSize: $rowSize, colSize: $colSize, whiteSpaceCreated: $whiteSpaceCreated, solved: $solved, failed: $failed)';
+    return 'Puzzle(tiles: $tiles, rowSize: $rowSize, colSize: $colSize, whiteSpaceCreated: $whiteSpaceCreated, solved: $solved, failed: $failed, reset: $reset)';
   }
 
   @override
@@ -217,7 +236,8 @@ class _$_Puzzle extends _Puzzle with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('colSize', colSize))
       ..add(DiagnosticsProperty('whiteSpaceCreated', whiteSpaceCreated))
       ..add(DiagnosticsProperty('solved', solved))
-      ..add(DiagnosticsProperty('failed', failed));
+      ..add(DiagnosticsProperty('failed', failed))
+      ..add(DiagnosticsProperty('reset', reset));
   }
 
   @override
@@ -231,7 +251,8 @@ class _$_Puzzle extends _Puzzle with DiagnosticableTreeMixin {
             const DeepCollectionEquality()
                 .equals(other.whiteSpaceCreated, whiteSpaceCreated) &&
             const DeepCollectionEquality().equals(other.solved, solved) &&
-            const DeepCollectionEquality().equals(other.failed, failed));
+            const DeepCollectionEquality().equals(other.failed, failed) &&
+            const DeepCollectionEquality().equals(other.reset, reset));
   }
 
   @override
@@ -242,7 +263,8 @@ class _$_Puzzle extends _Puzzle with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(colSize),
       const DeepCollectionEquality().hash(whiteSpaceCreated),
       const DeepCollectionEquality().hash(solved),
-      const DeepCollectionEquality().hash(failed));
+      const DeepCollectionEquality().hash(failed),
+      const DeepCollectionEquality().hash(reset));
 
   @JsonKey(ignore: true)
   @override
@@ -257,7 +279,8 @@ abstract class _Puzzle extends Puzzle {
       int colSize,
       bool whiteSpaceCreated,
       bool solved,
-      bool failed}) = _$_Puzzle;
+      bool failed,
+      int reset}) = _$_Puzzle;
   const _Puzzle._() : super._();
 
   @override
@@ -272,6 +295,8 @@ abstract class _Puzzle extends Puzzle {
   bool get solved;
   @override
   bool get failed;
+  @override
+  int get reset;
   @override
   @JsonKey(ignore: true)
   _$PuzzleCopyWith<_Puzzle> get copyWith => throw _privateConstructorUsedError;
