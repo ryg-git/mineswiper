@@ -16,5 +16,13 @@
     "lost": "You lost",
     "@lost": {
         "description": "Game over"
+    },
+    "ok": "Ok",
+    "@ok": {
+        "description": "Okay"
+    },
+    "reset": "Reset",
+    "@reset": {
+        "description": "Reset puzzle"
     }
 }

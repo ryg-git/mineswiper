@@ -167,18 +167,17 @@ class _ShowMessage extends HookConsumerWidget {
             if (isMounted() && puzzleState.puzzle.failed) {
               showDialog<String>(
                 context: context,
-                builder: (BuildContext context) => AlertDialog(
-                  title: Text(l10n.lost),
-                  content: Text(l10n.lost),
-                  actions: <Widget>[
-                    // TextButton(
-                    //   onPressed: () => Navigator.pop(context, 'Cancel'),
-                    //   child: const Text('Cancel'),
-                    // ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, 'OK'),
-                      child: const Text('OK'),
-                    ),
+                builder: (BuildContext context) => fui.ContentDialog(
+                  title: fui.Text(l10n.lost),
+                  actions: [
+                    fui.Button(
+                        child: fui.Text(l10n.ok),
+                        onPressed: () {
+                          ref.read(puzzleProvider.notifier).createPuzzle(
+                                ref.read(puzzleSizeProvider),
+                              );
+                          Navigator.pop(context);
+                        })
                   ],
                 ),
               );
@@ -191,18 +190,18 @@ class _ShowMessage extends HookConsumerWidget {
 
     return puzzleState.puzzle.whiteSpaceCreated
         ? SizedBox()
-        : fui.FluentTheme(
-            data: fui.ThemeData(
-              visualDensity: VisualDensity.standard,
-            ),
-            child: fui.Acrylic(
-              child: Center(
-                child: Text(
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              fui.Acrylic(
+                child: fui.Center(
+                  child: fui.Text(
                   l10n.tapTile,
-                  textAlign: TextAlign.center,
+                    textAlign: fui.TextAlign.center,
                 ),
               ),
-            ),
+              )
+            ],
           );
   }
 }
