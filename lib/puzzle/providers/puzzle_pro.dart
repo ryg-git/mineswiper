@@ -11,7 +11,7 @@ final puzzleSizeProvider = StateProvider<int>((ref) => 3);
 
 final mineCountProvider = StateProvider<int>((ref) => 0);
 
-final timerProvider = StreamProvider<int>(
+final timerProvider = StreamProvider.autoDispose<int>(
   (ref) => Stream.periodic(
     const Duration(seconds: 1),
     (i) => i,

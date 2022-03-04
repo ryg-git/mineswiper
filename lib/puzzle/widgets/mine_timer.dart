@@ -7,13 +7,8 @@ import 'package:mineswiper/utils/screen_dimensions.dart';
 class MineTimer extends HookConsumerWidget {
   const MineTimer({Key? key}) : super(key: key);
 
-  String _formatTime(int seconds) {
-    return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final seconds = ref.watch(timerProvider);
     final run = ref.watch(
       puzzleStateProvider.select(
         (value) =>
@@ -26,42 +21,7 @@ class MineTimer extends HookConsumerWidget {
     Widget getWidget(double dim) {
       return Padding(
         padding: const EdgeInsets.all(8.0),
-        child: run
-            ? seconds.when(
-                error: (error, stackTrace) => const SizedBox(),
-                loading: () => const SizedBox(),
-                data: (data) {
-                  return Stack(
-                    children: [
-                      const Positioned.fill(child: FlutterLogo()),
-                      Align(
-                        alignment: Alignment.center,
-                        child: SizedBox(
-                          child: Acrylic(
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      _formatTime(data),
-                                      style: FluentTheme.of(context)
-                                          .typography
-                                          .display,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              )
-            : const SizedBox(),
+        child: run ? const _Timer() : const SizedBox(),
       );
     }
 
@@ -71,6 +31,51 @@ class MineTimer extends HookConsumerWidget {
       small: (_, __) => getWidget(size.height / 5),
       medium: (_, __) => getWidget(size.height / 5),
       large: (_, __) => getWidget(size.width / 5),
+    );
+  }
+}
+
+class _Timer extends HookConsumerWidget {
+  const _Timer({Key? key}) : super(key: key);
+
+  String _formatTime(int seconds) {
+    return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final seconds = ref.watch(timerProvider);
+    return seconds.when(
+      error: (error, stackTrace) => const SizedBox(),
+      loading: () => const SizedBox(),
+      data: (data) {
+        return Stack(
+          children: [
+            const Positioned.fill(child: FlutterLogo()),
+            Align(
+              alignment: Alignment.center,
+              child: SizedBox(
+                child: Acrylic(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            _formatTime(data),
+                            style: FluentTheme.of(context).typography.display,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
