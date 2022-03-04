@@ -5,6 +5,7 @@ import 'package:mineswiper/l10n/l10n.dart';
 import 'package:mineswiper/puzzle/layout/responsible_layout_builder.dart';
 import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
 import 'package:mineswiper/puzzle/widgets/mine_count.dart';
+import 'package:mineswiper/puzzle/widgets/mine_timer.dart';
 import 'package:mineswiper/utils/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fui;
 
@@ -80,7 +81,12 @@ class _PuzzleSections extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           const PuzzleBoard(),
-          const MineCount(),
+          Column(
+            children: [
+              const MineCount(),
+              const MineTimer(),
+            ],
+          ),
         ],
       ),
     );

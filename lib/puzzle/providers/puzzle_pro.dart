@@ -11,6 +11,13 @@ final puzzleSizeProvider = StateProvider<int>((ref) => 3);
 
 final mineCountProvider = StateProvider<int>((ref) => 0);
 
+final timerProvider = StreamProvider<int>(
+  (ref) => Stream.periodic(
+    const Duration(seconds: 1),
+    (i) => i,
+  ),
+);
+
 final remainingProvider = StateProvider<int>((ref) => 0);
 
 final oddEvenProvider = StateProvider<bool>((ref) => random.nextBool());
@@ -25,10 +32,6 @@ final positionTileProvider =
       y: -1,
     ),
   );
-});
-
-final timerProvider = StreamProvider.autoDispose<int>((ref) {
-  return Stream.periodic(const Duration(milliseconds: 10));
 });
 
 final puzzleStateProvider = StateProvider<PuzzleState>((ref) {
