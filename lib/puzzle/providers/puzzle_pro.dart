@@ -7,7 +7,11 @@ import 'package:mineswiper/models/puzzle_state.dart';
 import 'package:mineswiper/models/tile.dart';
 import 'package:mineswiper/puzzle/layout/mine_puzzle_layout_delegate.dart';
 
-final puzzleSizeProvider = StateProvider<int>((ref) => 8);
+final puzzleSizeProvider = StateProvider<int>((ref) => 3);
+
+final mineCountProvider = StateProvider<int>((ref) => 0);
+
+final remainingProvider = StateProvider<int>((ref) => 0);
 
 final oddEvenProvider = StateProvider<bool>((ref) => random.nextBool());
 
@@ -21,6 +25,10 @@ final positionTileProvider =
       y: -1,
     ),
   );
+});
+
+final timerProvider = StreamProvider.autoDispose<int>((ref) {
+  return Stream.periodic(const Duration(milliseconds: 10));
 });
 
 final puzzleStateProvider = StateProvider<PuzzleState>((ref) {
@@ -112,6 +120,7 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
           !tile.position.isNearTile(el),
     );
     final mines = _allPossibleMines.take(mineNumber).toList();
+
     final minesTiles = correctPositions.map(
       (e) {
         if (mines.contains(e)) {
@@ -142,7 +151,14 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
     ).notifier)
         .state = tile.copyWith(
       isWhiteSpace: true,
+      position: tile.position.copyWith(
+        isVisited: true,
+      ),
     );
+
+    read(remainingProvider.notifier).state--;
+
+    read(mineCountProvider.notifier).state = mines.length;
 
     state = Puzzle(
       tiles: tiles,
@@ -204,10 +220,15 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
 
       if (tile.position.isMine) {
         if (tile.position.isFlagged) {
+          if (!state.tiles[tileIndex].position.isVisited) {
+            read(mineCountProvider.notifier).state--;
+            read(remainingProvider.notifier).state--;
+          }
           state.tiles[tileIndex] = tile.copyWith(
             isWhiteSpace: true,
             position: tile.position.copyWith(
               isDefused: true,
+              isVisited: true,
             ),
           );
         } else {
@@ -222,15 +243,26 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
           );
         }
       } else {
+        if (!state.tiles[tileIndex].position.isVisited) {
+          read(remainingProvider.notifier).state--;
+        }
         state.tiles[tileIndex] = tile.copyWith(
           isWhiteSpace: true,
+          position: tile.position.copyWith(
+            isVisited: true,
+          ),
         );
       }
 
       read(positionTileProvider(
         "${state.tiles[tileIndex].position.x}-${state.tiles[tileIndex].position.y}",
       ).notifier)
-          .state = state.tiles[tileIndex].copyWith(isWhiteSpace: true);
+          .state = state.tiles[tileIndex].copyWith(
+        isWhiteSpace: true,
+        position: tile.position.copyWith(
+          isVisited: true,
+        ),
+      );
 
       state.tiles[whitespaceTileIndex] = whitespaceTile.copyWith(
         isWhiteSpace: false,
@@ -266,6 +298,8 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
         ).notifier)
             .state = correctPositions.last;
       }
+      read(mineCountProvider.notifier).state = 0;
+      read(remainingProvider.notifier).state = correctPositions.length;
     }
 
     state = Puzzle(
@@ -284,7 +318,9 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
       (e) {
         if (whiteSpace.position.x == e.x && whiteSpace.position.y == e.y) {
           return Tile(
-            position: e,
+            position: e.copyWith(
+              isVisited: true,
+            ),
             isWhiteSpace: true,
           );
         } else {

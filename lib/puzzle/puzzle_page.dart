@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/l10n/l10n.dart';
 import 'package:mineswiper/puzzle/layout/responsible_layout_builder.dart';
 import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
+import 'package:mineswiper/puzzle/widgets/mine_count.dart';
 import 'package:mineswiper/utils/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fui;
 
@@ -75,10 +76,11 @@ class _PuzzleSections extends StatelessWidget {
         ],
       ),
       large: (context, child) => Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           const PuzzleBoard(),
+          const MineCount(),
         ],
       ),
     );
@@ -156,6 +158,7 @@ class _ShowMessage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final puzzleState = ref.watch(puzzleStateProvider);
+    final remainingTiles = ref.watch(remainingProvider);
     final l10n = context.l10n;
     final isMounted = useIsMounted();
 
@@ -171,13 +174,32 @@ class _ShowMessage extends HookConsumerWidget {
                   title: fui.Text(l10n.lost),
                   actions: [
                     fui.Button(
-                        child: fui.Text(l10n.ok),
-                        onPressed: () {
-                          ref.read(puzzleProvider.notifier).createPuzzle(
-                                ref.read(puzzleSizeProvider),
-                              );
-                          Navigator.pop(context);
-                        })
+                      child: fui.Text(l10n.ok),
+                      onPressed: () {
+                        ref.read(puzzleProvider.notifier).createPuzzle(
+                              ref.read(puzzleSizeProvider),
+                            );
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              );
+            } else if (isMounted() && remainingTiles == 0) {
+              showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => fui.ContentDialog(
+                  title: fui.Text(l10n.won),
+                  actions: [
+                    fui.Button(
+                      child: fui.Text(l10n.ok),
+                      onPressed: () {
+                        ref.read(puzzleProvider.notifier).createPuzzle(
+                              ref.read(puzzleSizeProvider),
+                            );
+                        Navigator.pop(context);
+                      },
+                    ),
                   ],
                 ),
               );
@@ -196,10 +218,10 @@ class _ShowMessage extends HookConsumerWidget {
               fui.Acrylic(
                 child: fui.Center(
                   child: fui.Text(
-                  l10n.tapTile,
+                    l10n.tapTile,
                     textAlign: fui.TextAlign.center,
+                  ),
                 ),
-              ),
               )
             ],
           );
