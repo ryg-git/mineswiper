@@ -5,6 +5,7 @@ import 'package:mineswiper/models/puzzle_state.dart';
 import 'package:mineswiper/models/tile.dart';
 import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
 import 'package:mineswiper/styles/text_styles.dart';
+import 'package:mineswiper/utils/theme.dart';
 
 class MinePuzzleTile extends HookConsumerWidget {
   /// {@macro simple_puzzle_tile}
@@ -29,25 +30,25 @@ class MinePuzzleTile extends HookConsumerWidget {
     final size = ref.read(puzzleSizeProvider);
     Widget getLetter() {
       if (tile.position.isFlagged) {
-        return const Text(
+        return Text(
           'F',
           style: TextStyle(
-            color: Colors.black,
+            color: context.theme.primaryColor,
           ),
         );
       } else if (tile.position.isVisited) {
         if (tile.position.isMine) {
-          return const Text(
+          return Text(
             'M',
             style: TextStyle(
-              color: Colors.black,
+              color: context.theme.primaryColor,
             ),
           );
         } else {
           return Text(
             '${tile.position.mines}',
             style: TextStyle(
-              color: Colors.black,
+              color: context.theme.primaryColor,
             ),
           );
         }
@@ -79,6 +80,8 @@ class MinePuzzleTile extends HookConsumerWidget {
         if (ref.read(puzzleProvider).whiteSpaceCreated) {
           if (ref.read(puzzleProvider.notifier).isTileMovable(tile)) {
             ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+          } else if (tile.position.isVisited) {
+            ref.read(puzzleProvider.notifier).moveWhiteSpace(tile);
           }
         } else {
           ref.read(puzzleProvider.notifier).createWhiteSpace(tile, size);

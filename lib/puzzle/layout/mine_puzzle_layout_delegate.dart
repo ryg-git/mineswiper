@@ -86,48 +86,36 @@ class MinePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
   @override
   Widget boardBuilder(int size, List<Widget> tiles) {
     // final double multi = 5 / size;
-    return Column(
+    return Stack(
+      alignment: Alignment.center,
       children: [
-        const ResponsiveGap(
-          small: 32,
-          medium: 48,
-          large: 96,
-        ),
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            ResponsiveLayoutBuilder(
-              small: (_, __) => SizedBox.square(
-                dimension: _BoardSize.small,
-                child: PuzzleBoard(
-                  key: const Key('simple_puzzle_board_small'),
-                  size: size,
-                  tiles: tiles,
-                  spacing: 5,
-                ),
-              ),
-              medium: (_, __) => SizedBox.square(
-                dimension: _BoardSize.medium,
-                child: PuzzleBoard(
-                  key: const Key('simple_puzzle_board_medium'),
-                  size: size,
-                  tiles: tiles,
-                ),
-              ),
-              large: (_, __) => SizedBox.square(
-                dimension: _BoardSize.large,
-                child: PuzzleBoard(
-                  key: const Key('simple_puzzle_board_large'),
-                  size: size,
-                  tiles: tiles,
-                  spacing: 30 / size,
-                ),
-              ),
+        ResponsiveLayoutBuilder(
+          small: (_, __) => SizedBox.square(
+            dimension: _BoardSize.small,
+            child: PuzzleBoard(
+              key: const Key('simple_puzzle_board_small'),
+              size: size,
+              tiles: tiles,
+              spacing: 5,
             ),
-          ],
-        ),
-        const ResponsiveGap(
-          large: 96,
+          ),
+          medium: (_, __) => SizedBox.square(
+            dimension: _BoardSize.medium,
+            child: PuzzleBoard(
+              key: const Key('simple_puzzle_board_medium'),
+              size: size,
+              tiles: tiles,
+            ),
+          ),
+          large: (_, __) => SizedBox.square(
+            dimension: _BoardSize.large,
+            child: PuzzleBoard(
+              key: const Key('simple_puzzle_board_large'),
+              size: size,
+              tiles: tiles,
+              spacing: 30 / size,
+            ),
+          ),
         ),
       ],
     );

@@ -6,6 +6,7 @@ import 'package:mineswiper/puzzle/layout/responsible_layout_builder.dart';
 import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
 import 'package:mineswiper/puzzle/widgets/mine_count.dart';
 import 'package:mineswiper/puzzle/widgets/mine_timer.dart';
+import 'package:mineswiper/utils/screen_dimensions.dart';
 import 'package:mineswiper/utils/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fui;
 
@@ -27,6 +28,12 @@ class PuzzleView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.theme.backgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: const MineCount(),
+        centerTitle: true,
+        elevation: 0,
+      ),
       body: const _Puzzle(
         key: Key('puzzle_view_puzzle'),
       ),
@@ -39,23 +46,8 @@ class _Puzzle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Stack(
-          children: [
-            SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
-                child: const _PuzzleSections(
-                  key: Key('puzzle_sections'),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+    return _PuzzleSections(
+      key: Key('puzzle_sections'),
     );
   }
 }
@@ -65,10 +57,19 @@ class _PuzzleSections extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = context.screensize;
     return ResponsiveLayoutBuilder(
       small: (context, child) => Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           const PuzzleBoard(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const MineCount(),
+              const MineTimer(),
+            ],
+          ),
         ],
       ),
       medium: (context, child) => Column(
@@ -76,17 +77,11 @@ class _PuzzleSections extends StatelessWidget {
           const PuzzleBoard(),
         ],
       ),
-      large: (context, child) => Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      large: (context, child) => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PuzzleBoard(),
-          Column(
-            children: [
-              const MineCount(),
-              const MineTimer(),
-            ],
-          ),
+          Expanded(child: const PuzzleBoard()),
         ],
       ),
     );
@@ -105,9 +100,9 @@ class PuzzleBoard extends HookConsumerWidget {
 
     if (size == 0) return const CircularProgressIndicator();
     return InteractiveViewer(
-      panEnabled: false,
-      boundaryMargin: EdgeInsets.all(80),
-      minScale: 0.5,
+      panEnabled: true,
+      boundaryMargin: EdgeInsets.all(10),
+      minScale: 1,
       maxScale: 8,
       child: Stack(
         alignment: Alignment.center,
@@ -218,18 +213,11 @@ class _ShowMessage extends HookConsumerWidget {
 
     return puzzleState.puzzle.whiteSpaceCreated
         ? SizedBox()
-        : Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              fui.Acrylic(
-                child: fui.Center(
-                  child: fui.Text(
-                    l10n.tapTile,
-                    textAlign: fui.TextAlign.center,
-                  ),
-                ),
-              )
-            ],
+        : fui.Acrylic(
+            child: fui.Text(
+              l10n.tapTile,
+              textAlign: fui.TextAlign.center,
+            ),
           );
   }
 }
