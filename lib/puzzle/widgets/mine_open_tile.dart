@@ -56,7 +56,12 @@ class MineOpenTile extends HookConsumerWidget {
     }
 
     return Center(
-      child: getLetter(),
+      child: GestureDetector(
+        onLongPress: () {
+          ref.read(puzzleProvider.notifier).autoFlagTile(tile);
+        },
+        child: getLetter(),
+      ),
     );
   }
 }

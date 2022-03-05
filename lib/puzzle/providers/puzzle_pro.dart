@@ -7,7 +7,7 @@ import 'package:mineswiper/models/puzzle_state.dart';
 import 'package:mineswiper/models/tile.dart';
 import 'package:mineswiper/puzzle/layout/mine_puzzle_layout_delegate.dart';
 
-final puzzleSizeProvider = StateProvider<int>((ref) => 3);
+final puzzleSizeProvider = StateProvider<int>((ref) => 5);
 
 final mineCountProvider = StateProvider<int>((ref) => 0);
 
@@ -77,22 +77,14 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
   bool isTileMovable(Tile tile) {
     if (state.whiteSpaceCreated) {
       final whitespaceTile = getWhitespaceTile();
-      if (tile == whitespaceTile) {
-        return false;
-      }
-
-      if (whitespaceTile.position.x != tile.position.x &&
-          whitespaceTile.position.y != tile.position.y) {
-        return false;
-      }
-      return true;
+      return whitespaceTile.position.isNearTile(tile.position);
     } else {
       return false;
     }
   }
 
   void createWhiteSpace(Tile tile, int size) {
-    final mineNumber = (size * size * 4) ~/ 10;
+    final mineNumber = (size * size * 2.5) ~/ 10;
     final oddOrEven = random.nextBool();
 
     final correctPositions = <Position>[];
@@ -193,6 +185,78 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
           return e;
         }
       }).toList(),
+    );
+  }
+
+  void autoFlagTile(Tile tile) {
+    final unFlaggedTiles = state.tiles.fold<List<int>>(
+      [0, 0],
+      (previousValue, element) {
+        if (tile.position.isNearTile(element.position)) {
+          return !element.position.isFlagged && element.position.isVisited
+              ? [++previousValue[0], ++previousValue[1]]
+              : [++previousValue[0], previousValue[1]];
+        } else {
+          return previousValue;
+        }
+      },
+    );
+
+    final totalNear = unFlaggedTiles[0];
+    final unflaggedNear = totalNear - unFlaggedTiles[1];
+
+    if (unflaggedNear == tile.position.mines) {
+      state = state.copyWith(
+        tiles: state.tiles.map((e) {
+          if (tile.position.isNearTile(e.position) && !e.position.isVisited) {
+            read(positionTileProvider(
+              "${e.position.x}-${e.position.y}",
+            ).notifier)
+                .state = e.copyWith(
+              position: e.position.copyWith(
+                isFlagged: true,
+              ),
+            );
+            return e.copyWith(
+              position: e.position.copyWith(
+                isFlagged: true,
+              ),
+            );
+          } else {
+            return e;
+          }
+        }).toList(),
+      );
+    }
+  }
+
+  void moveWhiteSpace(Tile tile) {
+    final whitespaceTile = getWhitespaceTile();
+
+    state = state.copyWith(
+      tiles: state.tiles.map(
+        (e) {
+          if (whitespaceTile.compareOnlyPosition(e)) {
+            return e.copyWith(isWhiteSpace: false);
+          } else if (tile.compareOnlyPosition(e)) {
+            return e.copyWith(isWhiteSpace: true);
+          }
+
+          return e;
+        },
+      ).toList(),
+    );
+    read(positionTileProvider(
+      "${tile.position.x}-${tile.position.y}",
+    ).notifier)
+        .state = tile.copyWith(
+      isWhiteSpace: true,
+    );
+    read(positionTileProvider(
+      "${whitespaceTile.position.x}-${whitespaceTile.position.y}",
+    ).notifier)
+        .state = whitespaceTile.copyWith(
+      isWhiteSpace: false,
     );
   }
 
