@@ -17,4 +17,20 @@ class Tile with _$Tile {
   bool compareOnlyPosition(Tile other) {
     return position.x == other.position.x && position.y == other.position.y;
   }
+
+  bool onRight(Tile other) {
+    return position.y + 1 == other.position.y && position.x == other.position.x;
+  }
+
+  bool onLeft(Tile other) {
+    return position.y - 1 == other.position.y && position.x == other.position.x;
+  }
+
+  bool onTop(Tile other) {
+    return position.y == other.position.y && position.x - 1 == other.position.x;
+  }
+
+  bool onBottom(Tile other) {
+    return position.y == other.position.y && position.x + 1 == other.position.x;
+  }
 }

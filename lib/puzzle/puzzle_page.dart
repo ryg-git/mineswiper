@@ -9,6 +9,7 @@ import 'package:mineswiper/puzzle/widgets/mine_timer.dart';
 import 'package:mineswiper/utils/screen_dimensions.dart';
 import 'package:mineswiper/utils/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fui;
+import 'package:throttling/throttling.dart';
 
 class PuzzlePage extends StatelessWidget {
   /// {@macro puzzle_page}
@@ -98,29 +99,50 @@ class PuzzleBoard extends HookConsumerWidget {
     final size = ref.read(puzzleSizeProvider);
     final puzzleState = ref.read(puzzleStateProvider);
 
+    final _focusNode = useFocusNode();
+
+    final thr = Throttling(
+      duration: const Duration(milliseconds: 300),
+    );
+
+    void _handleKeyEvent(RawKeyEvent event) {
+      print("key ${event.logicalKey}");
+      if (ref.read(puzzleStateProvider).puzzle.whiteSpaceCreated &&
+          !ref.read(puzzleStateProvider).puzzle.failed) {
+        ref.read(puzzleProvider.notifier).handleKeyEvent(event);
+      }
+    }
+
     if (size == 0) return const CircularProgressIndicator();
     return InteractiveViewer(
+      onInteractionEnd: (details) =>
+          FocusScope.of(context).requestFocus(_focusNode),
       panEnabled: true,
       boundaryMargin: EdgeInsets.all(10),
       minScale: 1,
       maxScale: 8,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          puzzleLayout.boardBuilder(
-            size,
-            puzzleState.puzzle.tiles
-                .map(
-                  (tile) => _PuzzleTile(
-                    key: Key('puzzle_tile_${tile.position.toString()}'),
-                    x: tile.position.x,
-                    y: tile.position.y,
-                  ),
-                )
-                .toList(),
-          ),
-          _ShowMessage(),
-        ],
+      child: RawKeyboardListener(
+        focusNode: _focusNode,
+        onKey: (event) => thr.throttle(() => _handleKeyEvent(event)),
+        autofocus: true,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            puzzleLayout.boardBuilder(
+              size,
+              puzzleState.puzzle.tiles
+                  .map(
+                    (tile) => _PuzzleTile(
+                      key: Key('puzzle_tile_${tile.position.toString()}'),
+                      x: tile.position.x,
+                      y: tile.position.y,
+                    ),
+                  )
+                  .toList(),
+            ),
+            _ShowMessage(),
+          ],
+        ),
       ),
     );
   }

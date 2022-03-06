@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/models/position.dart';
 import 'package:mineswiper/models/puzzle.dart';
@@ -84,7 +86,7 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
   }
 
   void createWhiteSpace(Tile tile, int size) {
-    final mineNumber = (size * size * 2.5) ~/ 10;
+    final mineNumber = (size * size) ~/ 5;
     final oddOrEven = random.nextBool();
 
     final correctPositions = <Position>[];
@@ -205,7 +207,7 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
     final totalNear = unFlaggedTiles[0];
     final unflaggedNear = totalNear - unFlaggedTiles[1];
 
-    if (unflaggedNear == tile.position.mines) {
+    if (unflaggedNear == tile.position.mines && tile.isWhiteSpace) {
       state = state.copyWith(
         tiles: state.tiles.map((e) {
           if (tile.position.isNearTile(e.position) && !e.position.isVisited) {
@@ -227,6 +229,37 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
           }
         }).toList(),
       );
+    }
+  }
+
+  void handleKeyEvent(RawKeyEvent event) async {
+    try {
+      final whitespaceTile = getWhitespaceTile();
+      if (event.logicalKey == LogicalKeyboardKey.keyF) {
+        autoFlagTile(whitespaceTile);
+      } else if (event.data.logicalKey.keyLabel == "Arrow Left") {
+        final t =
+            state.tiles.firstWhere((element) => element.onLeft(whitespaceTile));
+
+        moveTiles(t, []);
+      } else if (event.data.logicalKey.keyLabel == "Arrow Right") {
+        final t = state.tiles
+            .firstWhere((element) => element.onRight(whitespaceTile));
+
+        moveTiles(t, []);
+      } else if (event.data.logicalKey.keyLabel == "Arrow Up") {
+        final t = state.tiles
+            .firstWhere((element) => element.onBottom(whitespaceTile));
+
+        moveTiles(t, []);
+      } else if (event.data.logicalKey.keyLabel == "Arrow Down") {
+        final t =
+            state.tiles.firstWhere((element) => element.onTop(whitespaceTile));
+
+        moveTiles(t, []);
+      }
+    } catch (e) {
+      print("Error: $e");
     }
   }
 
