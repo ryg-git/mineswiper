@@ -55,16 +55,21 @@ class MineOpenTile extends HookConsumerWidget {
       }
     }
 
-    return Center(
-      child: TextButton(
-        onPressed: () {
-          ref.read(puzzleProvider.notifier).autoFlagTile(tile);
-        },
-        style: TextButton.styleFrom(
-          splashFactory: NoSplash.splashFactory,
-        ),
-        child: getLetter(),
-      ),
+    return DragTarget<Tile>(
+      builder: (context, accepted, rejected) {
+        return Center(
+          child: TextButton(
+            onPressed: () {
+              ref.read(puzzleProvider.notifier).autoFlagTile(tile);
+            },
+            style: TextButton.styleFrom(
+              splashFactory: NoSplash.splashFactory,
+            ),
+            child: getLetter(),
+          ),
+        );
+      },
+      onAccept: (tile) => print("Accepted $tile"),
     );
   }
 }

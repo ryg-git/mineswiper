@@ -96,7 +96,7 @@ class MinePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
               key: const Key('simple_puzzle_board_small'),
               size: size,
               tiles: tiles,
-              spacing: 5,
+              spacing: 25 / size,
             ),
           ),
           medium: (_, __) => SizedBox.square(
@@ -105,6 +105,7 @@ class MinePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
               key: const Key('simple_puzzle_board_medium'),
               size: size,
               tiles: tiles,
+              spacing: 25 / size,
             ),
           ),
           large: (_, __) => SizedBox.square(
@@ -113,7 +114,7 @@ class MinePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
               key: const Key('simple_puzzle_board_large'),
               size: size,
               tiles: tiles,
-              spacing: 30 / size,
+              spacing: 25 / size,
             ),
           ),
         ),
