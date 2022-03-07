@@ -58,7 +58,6 @@ class _PuzzleSections extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = context.screensize;
     return ResponsiveLayoutBuilder(
       small: (context, child) => Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -184,49 +183,54 @@ class _ShowMessage extends HookConsumerWidget {
     final remainingTiles = ref.watch(remainingProvider);
     final l10n = context.l10n;
     final isMounted = useIsMounted();
+    final isOpen = useState(false);
 
     useEffect(
       () {
         Future.delayed(
           Duration.zero,
           () {
-            if (isMounted() && puzzleState.puzzle.failed) {
-              showDialog<String>(
-                context: context,
-                builder: (BuildContext context) => fui.ContentDialog(
-                  title: fui.Text(l10n.lost),
-                  actions: [
-                    fui.Button(
-                      child: fui.Text(l10n.ok),
-                      onPressed: () {
-                        ref.read(puzzleProvider.notifier).createPuzzle(
-                              ref.read(puzzleSizeProvider),
-                            );
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
-              );
-            } else if (isMounted() && remainingTiles == 0) {
-              showDialog<String>(
-                context: context,
-                builder: (BuildContext context) => fui.ContentDialog(
-                  title: fui.Text(l10n.won),
-                  actions: [
-                    fui.Button(
-                      child: fui.Text(l10n.ok),
-                      onPressed: () {
-                        ref.read(puzzleProvider.notifier).createPuzzle(
-                              ref.read(puzzleSizeProvider),
-                            );
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
-              );
+            if (!isOpen.value) {
+              if (isMounted() && puzzleState.puzzle.failed) {
+                showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => fui.ContentDialog(
+                    title: fui.Text(l10n.lost),
+                    actions: [
+                      fui.Button(
+                        child: fui.Text(l10n.ok),
+                        onPressed: () {
+                          ref.read(puzzleProvider.notifier).createPuzzle(
+                                ref.read(puzzleSizeProvider),
+                              );
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ).then((v) => isOpen.value = true);
+              } else if (isMounted() && remainingTiles == 0) {
+                showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => fui.ContentDialog(
+                    title: fui.Text(l10n.won),
+                    actions: [
+                      fui.Button(
+                        child: fui.Text(l10n.ok),
+                        onPressed: () {
+                          ref.read(puzzleProvider.notifier).createPuzzle(
+                                ref.read(puzzleSizeProvider),
+                              );
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ).then((v) => isOpen.value = true);
+                ;
+              }
             }
+            isOpen.value = false;
           },
         );
         return;

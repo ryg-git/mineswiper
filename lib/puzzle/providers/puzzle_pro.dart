@@ -20,7 +20,7 @@ final timerProvider = StreamProvider.autoDispose<int>(
   ),
 );
 
-final remainingProvider = StateProvider<int>((ref) => 0);
+final remainingProvider = StateProvider<int>((ref) => -1);
 
 final oddEvenProvider = StateProvider<bool>((ref) => random.nextBool());
 
@@ -248,13 +248,13 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
 
         moveTiles(t, []);
       } else if (event.data.logicalKey.keyLabel == "Arrow Up") {
-        final t = state.tiles
-            .firstWhere((element) => element.onBottom(whitespaceTile));
+        final t =
+            state.tiles.firstWhere((element) => element.onTop(whitespaceTile));
 
         moveTiles(t, []);
       } else if (event.data.logicalKey.keyLabel == "Arrow Down") {
-        final t =
-            state.tiles.firstWhere((element) => element.onTop(whitespaceTile));
+        final t = state.tiles
+            .firstWhere((element) => element.onBottom(whitespaceTile));
 
         moveTiles(t, []);
       }
