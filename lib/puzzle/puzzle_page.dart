@@ -59,16 +59,10 @@ class _PuzzleSections extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveLayoutBuilder(
       small: (context, child) => Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PuzzleBoard(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const MineCount(),
-              const MineTimer(),
-            ],
-          ),
+          Expanded(child: const PuzzleBoard()),
         ],
       ),
       medium: (context, child) => Column(

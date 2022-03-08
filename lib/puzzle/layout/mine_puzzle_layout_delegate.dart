@@ -90,14 +90,11 @@ class MinePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
       alignment: Alignment.center,
       children: [
         ResponsiveLayoutBuilder(
-          small: (_, __) => SizedBox.square(
-            dimension: _BoardSize.small,
-            child: PuzzleBoard(
-              key: const Key('simple_puzzle_board_small'),
-              size: size,
-              tiles: tiles,
-              spacing: 25 / size,
-            ),
+          small: (_, __) => PuzzleBoard(
+            key: const Key('simple_puzzle_board_small'),
+            size: size,
+            tiles: tiles,
+            spacing: 25 / size,
           ),
           medium: (_, __) => SizedBox.square(
             dimension: _BoardSize.medium,

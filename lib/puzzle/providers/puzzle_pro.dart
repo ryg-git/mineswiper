@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/models/position.dart';
@@ -9,7 +10,7 @@ import 'package:mineswiper/models/puzzle_state.dart';
 import 'package:mineswiper/models/tile.dart';
 import 'package:mineswiper/puzzle/layout/mine_puzzle_layout_delegate.dart';
 
-final puzzleSizeProvider = StateProvider<int>((ref) => 5);
+final puzzleSizeProvider = StateProvider<int>((ref) => 20);
 
 final mineCountProvider = StateProvider<int>((ref) => 0);
 
@@ -74,6 +75,15 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
         ),
       ),
     );
+  }
+
+  List<int> WhiteSpaceDiff(Tile tile) {
+    final whiteSpaceTile = getWhitespaceTile();
+
+    return [
+      whiteSpaceTile.position.x - tile.position.x,
+      whiteSpaceTile.position.y - tile.position.y,
+    ];
   }
 
   bool isTileMovable(Tile tile) {

@@ -40,12 +40,6 @@ class MinePuzzleTile extends HookConsumerWidget {
       ),
     );
 
-    final yController = useAnimationController(
-      duration: Duration(
-        milliseconds: 200,
-      ),
-    );
-
     final xtween = useAnimation(Tween<double>(
       begin: 0,
       end: 1,
@@ -80,98 +74,157 @@ class MinePuzzleTile extends HookConsumerWidget {
       }
     }
 
-    final offset = useState<Offset>(const Offset(0, 0));
+    final offset = useState<double>(0);
+    final xValue = useState<int>(0);
+    final yValue = useState<int>(0);
 
-    return GestureDetector(
-      onPanUpdate: (details) {
-        final RenderBox box = context.findRenderObject() as RenderBox;
+    return LayoutBuilder(
+      builder: (context, constaints) {
+        final fTween = Tween<double>(
+          begin: 0,
+          end: 1,
+        );
+        final hTween = Tween<double>(
+          begin: 0.5,
+          end: -0.5,
+        );
 
         final puzzleSpacing = 25 / size;
 
-        print(box.size);
+        return GestureDetector(
+          onPanUpdate: (details) {
+            // final RenderBox box = context.findRenderObject() as RenderBox;
 
-        print("local y: ${details.localPosition.dy}");
+            // final dist = ref.read(puzzleProvider.notifier).WhiteSpaceDiff(tile);
 
-        final oy = details.localPosition.dy - box.size.height;
+            // final xvalue = dist[0];
+            // final y = dist[1];
 
-        if (oy > 0 && oy <= (box.size.height + puzzleSpacing)) {
-          double ox = 0;
+            // if (x) {}
 
-          if (oy < (box.size.height + puzzleSpacing) / 2) {
-            ox = oy / (box.size.height + puzzleSpacing);
-            xController.animateTo(ox);
-          } else {
-            ox = 1 - oy / (box.size.height + puzzleSpacing);
-            xController.animateTo(ox);
-          }
+            print("local y: ${details.localPosition.dy}");
 
-          offset.value = Offset(0, oy);
-        } else if (oy > (box.size.height + puzzleSpacing)) {
-          ref.read(puzzleProvider.notifier).moveTiles(tile, []);
-          xController.reverse();
-        }
+            if (xValue.value == 1) {
+              final oy = details.localPosition.dy - constaints.maxHeight;
 
-        // if (details.delta.dx > 0)
-        //   print("Dragging in +X direction");
-        // else
-        //   print("Dragging in -X direction");
+              if (oy > 0 && oy <= (constaints.maxHeight + puzzleSpacing)) {
+                double ox = 0;
 
-        // if (details.delta.dy > 0)
-        //   print("Dragging in +Y direction");
-        // else
-        //   print("Dragging in -Y direction");
-      },
-      child: CustomPaint(
-        painter: TilePainter(
-          move: xtween,
-          color: PuzzleColors.primary0,
-          offset: offset.value,
-        ),
-        child: Container(
-          // color: PuzzleColors.primary0,
-          child: TextButton(
-            style: TextButton.styleFrom(
-              // primary: PuzzleColors.white,
-              textStyle: PuzzleTextStyle.headline2.copyWith(
-                fontSize: tileFontSize * 3 / size,
-              ),
-            ).copyWith(
-              foregroundColor: MaterialStateProperty.all(PuzzleColors.tileText),
-              // backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-              //   (states) {
-              //     return PuzzleColors.primary0;
-              //   },
-              // ),
-            ),
-            onHover: (b) {
-              if (b) {
-                // borderRadius.value = borderRadius.value * 15;
-                // xController.animateTo(0.2);
-              } else {
-                // borderRadius.value = borderRadius.value / 15;
-                // xController.reverse();
-              }
-            },
-            onPressed: () {
-              if (ref.read(puzzleProvider).whiteSpaceCreated) {
-                if (ref.read(puzzleProvider.notifier).isTileMovable(tile)) {
-                  ref.read(puzzleProvider.notifier).moveTiles(tile, []);
-                } else if (tile.position.isVisited) {
-                  ref.read(puzzleProvider.notifier).moveWhiteSpace(tile);
+                if (oy < (constaints.maxHeight + puzzleSpacing) / 2) {
+                  ox = oy / (constaints.maxHeight + puzzleSpacing);
+                  if (ox > 0.1) xController.value = ox;
+                } else {
+                  ox = 1 - oy / (constaints.maxHeight + puzzleSpacing);
+                  xController.value = ox;
                 }
-              } else {
-                ref.read(puzzleProvider.notifier).createWhiteSpace(tile, size);
+
+                offset.value = oy;
+              } else if (oy > (constaints.maxHeight + puzzleSpacing)) {
+                ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+                xController.reverse();
               }
-            },
-            onLongPress: () {
-              if (ref.read(puzzleProvider).whiteSpaceCreated) {
-                ref.read(puzzleProvider.notifier).flagTile(tile);
+            } else if (xValue.value == -1) {
+              final oy = details.localPosition.dy - constaints.maxHeight;
+              print(oy);
+              if (oy <= 0 && oy > -(constaints.maxHeight + puzzleSpacing)) {
+                double ox = 0;
+
+                if (oy.abs() < (constaints.maxHeight + puzzleSpacing) / 2) {
+                  ox = oy.abs() / (constaints.maxHeight + puzzleSpacing);
+                  if (ox > 0.1) xController.value = ox;
+                } else {
+                  ox = 1 - oy.abs() / (constaints.maxHeight + puzzleSpacing);
+                  xController.value = ox;
+                }
+
+                offset.value = oy.abs();
+              } else if (oy <= -(constaints.maxHeight + puzzleSpacing)) {
+                ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+                xController.reverse();
               }
-            },
-            child: getLetter(),
+            }
+
+            // if (details.delta.dx > 0)
+            //   print("Dragging in +X direction");
+            // else
+            //   print("Dragging in -X direction");
+
+            // if (details.delta.dy > 0)
+            //   print("Dragging in +Y direction");
+            // else
+            //   print("Dragging in -Y direction");
+          },
+          onPanEnd: (details) {
+            xController.reverse();
+          },
+          child: CustomPaint(
+            painter: TilePainter(
+              move: fTween.evaluate(xController),
+              color: PuzzleColors.primary0,
+              y: offset.value,
+              xValue: xValue.value,
+            ),
+            child: Container(
+              // color: PuzzleColors.primary0,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  // primary: PuzzleColors.white,
+                  textStyle: PuzzleTextStyle.headline2.copyWith(
+                    fontSize: tileFontSize * 3 / size,
+                  ),
+                ).copyWith(
+                  foregroundColor:
+                      MaterialStateProperty.all(PuzzleColors.tileText),
+                  // backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                  //   (states) {
+                  //     return PuzzleColors.primary0;
+                  //   },
+                  // ),
+                ),
+                onHover: (b) {
+                  final dist =
+                      ref.read(puzzleProvider.notifier).WhiteSpaceDiff(tile);
+
+                  final x = dist[0];
+                  final y = dist[1];
+
+                  print("x: $x");
+                  print("y: $y");
+
+                  if (x.abs() + y.abs() == 1) {
+                    xValue.value = x;
+                    yValue.value = y;
+                    if (b) {
+                      xController.animateTo(0.1);
+                    } else {
+                      xController.reverse();
+                    }
+                  }
+                },
+                onPressed: () {
+                  if (ref.read(puzzleProvider).whiteSpaceCreated) {
+                    if (ref.read(puzzleProvider.notifier).isTileMovable(tile)) {
+                      ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+                    } else if (tile.position.isVisited) {
+                      ref.read(puzzleProvider.notifier).moveWhiteSpace(tile);
+                    }
+                  } else {
+                    ref
+                        .read(puzzleProvider.notifier)
+                        .createWhiteSpace(tile, size);
+                  }
+                },
+                onLongPress: () {
+                  if (ref.read(puzzleProvider).whiteSpaceCreated) {
+                    ref.read(puzzleProvider.notifier).flagTile(tile);
+                  }
+                },
+                child: getLetter(),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -179,32 +232,66 @@ class MinePuzzleTile extends HookConsumerWidget {
 class TilePainter extends CustomPainter {
   final double move;
   final Color color;
-  final Offset offset;
+  final double y;
+  final int xValue;
+  final int yValue;
 
   TilePainter({
     this.move = 0,
     this.color = Colors.white,
-    this.offset = const Offset(0, 0),
+    this.y = 0,
+    this.xValue = 1,
+    this.yValue = 0,
   });
   @override
   void paint(Canvas canvas, Size size) {
     Path path = Path();
-    path.lineTo(0, size.height + offset.dy);
-    // path.lineTo(0, 3 * size.height / 4);
-    // path.lineTo(size.width / 2, size.height);
-    path.lineTo(
-      size.width / 2,
-      size.height * (1 + move) + offset.dy,
-    );
-    path.lineTo(size.width, size.height + offset.dy);
-    // path.lineTo(size.width, 3 * size.height / 4);
-    path.lineTo(size.width, 0 + offset.dy);
-    path.lineTo(
-      size.width / 2,
-      size.height * move + offset.dy,
-    );
 
-    path.lineTo(0, offset.dy);
+    if (xValue == 1) {
+      path.lineTo(0, size.height + y);
+      path.lineTo(
+        size.width / 2,
+        size.height * (1 + move) + y,
+      );
+      path.lineTo(size.width, size.height + y);
+      // path.lineTo(size.width, 3 * size.height / 4);
+      path.lineTo(size.width, 0 + y);
+      path.lineTo(
+        size.width / 2,
+        size.height * move + y,
+      );
+
+      path.lineTo(0, y);
+    } else if (xValue == -1) {
+      path.lineTo(0, -y);
+      path.lineTo(0, size.height - y);
+
+      path.lineTo(
+        size.width / 2,
+        size.height - size.height * move - y,
+      );
+      path.lineTo(size.width, size.height - y);
+      path.lineTo(size.width, -y);
+      path.lineTo(size.width / 2, -move * size.height - y);
+      path.lineTo(0, -y);
+    } else {
+      path.lineTo(0, size.height);
+      path.lineTo(size.width, size.height);
+      path.lineTo(size.width, 0);
+    }
+
+    final Paint paint = new Paint()..color = color;
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+/*
     // path.lineTo(size.width / 2, size.height / 4);
     // path.quadraticBezierTo(0, size.height * 0.8, 0.1 * size.width, size.height);
     // path.lineTo(size.width * 0.4, size.height * 1.4);
@@ -235,14 +322,4 @@ class TilePainter extends CustomPainter {
 
     // path.lineTo(size.width, 0);
     // final Rect colorBounds = Rect.fromLTRB(0, 0, size.width, size.height);
-
-    final Paint paint = new Paint()..color = color;
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
-}
+*/
