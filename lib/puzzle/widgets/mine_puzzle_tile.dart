@@ -8,8 +8,6 @@ import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
 import 'package:mineswiper/styles/text_styles.dart';
 import 'package:mineswiper/utils/theme.dart';
 
-import "dart:math" show pi;
-
 class MinePuzzleTile extends HookConsumerWidget {
   /// {@macro simple_puzzle_tile}
   const MinePuzzleTile({
@@ -75,6 +73,7 @@ class MinePuzzleTile extends HookConsumerWidget {
     }
 
     final offset = useState<double>(0);
+    final panStart = useState<Offset?>(null);
     final xValue = useState<int>(0);
     final yValue = useState<int>(0);
 
@@ -105,7 +104,10 @@ class MinePuzzleTile extends HookConsumerWidget {
             print("local y: ${details.localPosition.dy}");
 
             if (xValue.value == 1) {
-              final oy = details.localPosition.dy - constaints.maxHeight;
+              var oy = details.localPosition.dy - constaints.maxHeight;
+              if (panStart.value != null) {
+                oy = details.localPosition.dy - panStart.value!.dy;
+              }
 
               if (oy > 0 && oy <= (constaints.maxHeight + puzzleSpacing)) {
                 double ox = 0;
@@ -124,7 +126,10 @@ class MinePuzzleTile extends HookConsumerWidget {
                 xController.reverse();
               }
             } else if (xValue.value == -1) {
-              final oy = details.localPosition.dy - constaints.maxHeight;
+              var oy = details.localPosition.dy - constaints.maxHeight;
+              if (panStart.value != null) {
+                oy = details.localPosition.dy - panStart.value!.dy;
+              }
               print(oy);
               if (oy <= 0 && oy > -(constaints.maxHeight + puzzleSpacing)) {
                 double ox = 0;
@@ -153,6 +158,9 @@ class MinePuzzleTile extends HookConsumerWidget {
             //   print("Dragging in +Y direction");
             // else
             //   print("Dragging in -Y direction");
+          },
+          onPanStart: (details) {
+            panStart.value = details.localPosition;
           },
           onPanEnd: (details) {
             xController.reverse();
