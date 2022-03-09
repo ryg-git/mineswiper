@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/l10n/l10n.dart';
-import 'package:mineswiper/puzzle/layout/responsible_layout_builder.dart';
 import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
 import 'package:mineswiper/puzzle/widgets/mine_count.dart';
-// import 'package:mineswiper/puzzle/widgets/mine_timer.dart';
+import 'package:mineswiper/puzzle/widgets/mine_timer.dart';
 import 'package:mineswiper/utils/theme.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fui;
 import 'package:throttling/throttling.dart';
 
 class PuzzlePage extends StatelessWidget {
@@ -29,8 +27,14 @@ class PuzzleView extends StatelessWidget {
     return Scaffold(
       backgroundColor: context.theme.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: const MineCount(),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: const [
+            MineTimer(),
+            MineCount(),
+          ],
+        ),
         centerTitle: true,
         elevation: 0,
       ),
@@ -57,26 +61,12 @@ class _PuzzleSections extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveLayoutBuilder(
-      small: (context, child) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(child: const PuzzleBoard()),
-        ],
-      ),
-      medium: (context, child) => Column(
-        children: [
-          const PuzzleBoard(),
-        ],
-      ),
-      large: (context, child) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(child: const PuzzleBoard()),
-        ],
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(child: const PuzzleBoard()),
+      ],
     );
   }
 }
@@ -187,11 +177,11 @@ class _ShowMessage extends HookConsumerWidget {
               if (isMounted() && puzzleState.puzzle.failed) {
                 showDialog<String>(
                   context: context,
-                  builder: (BuildContext context) => fui.ContentDialog(
-                    title: fui.Text(l10n.lost),
+                  builder: (BuildContext context) => AlertDialog(
+                    title: Text(l10n.lost),
                     actions: [
-                      fui.Button(
-                        child: fui.Text(l10n.ok),
+                      TextButton(
+                        child: Text(l10n.ok),
                         onPressed: () {
                           ref.read(puzzleProvider.notifier).createPuzzle(
                                 ref.read(puzzleSizeProvider),
@@ -205,11 +195,11 @@ class _ShowMessage extends HookConsumerWidget {
               } else if (isMounted() && remainingTiles == 0) {
                 showDialog<String>(
                   context: context,
-                  builder: (BuildContext context) => fui.ContentDialog(
-                    title: fui.Text(l10n.won),
+                  builder: (BuildContext context) => AlertDialog(
+                    title: Text(l10n.won),
                     actions: [
-                      fui.Button(
-                        child: fui.Text(l10n.ok),
+                      TextButton(
+                        child: Text(l10n.ok),
                         onPressed: () {
                           ref.read(puzzleProvider.notifier).createPuzzle(
                                 ref.read(puzzleSizeProvider),
@@ -232,10 +222,10 @@ class _ShowMessage extends HookConsumerWidget {
 
     return puzzleState.puzzle.whiteSpaceCreated
         ? SizedBox()
-        : fui.Acrylic(
-            child: fui.Text(
+        : Chip(
+            label: Text(
               l10n.tapTile,
-              textAlign: fui.TextAlign.center,
+              textAlign: TextAlign.center,
             ),
           );
   }

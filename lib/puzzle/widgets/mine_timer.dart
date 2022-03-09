@@ -1,4 +1,4 @@
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/puzzle/layout/responsible_layout_builder.dart';
 import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
@@ -39,7 +39,9 @@ class _Timer extends HookConsumerWidget {
   const _Timer({Key? key}) : super(key: key);
 
   String _formatTime(int seconds) {
-    return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
+    final minSec = '${(Duration(seconds: seconds))}'.split('.')[0].split(":");
+    minSec.removeAt(0);
+    return minSec.join(":").padLeft(4, '0');
   }
 
   @override
@@ -49,29 +51,12 @@ class _Timer extends HookConsumerWidget {
       error: (error, stackTrace) => const SizedBox(),
       loading: () => const SizedBox(),
       data: (data) {
-        return Stack(
+        return Row(
           children: [
-            const Positioned.fill(child: FlutterLogo()),
-            Align(
-              alignment: Alignment.center,
-              child: SizedBox(
-                child: Acrylic(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            _formatTime(data),
-                            style: FluentTheme.of(context).typography.display,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+            Icon(Icons.timer_outlined),
+            Text(
+              _formatTime(data),
+              textAlign: TextAlign.center,
             ),
           ],
         );

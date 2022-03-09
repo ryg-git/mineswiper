@@ -1,4 +1,4 @@
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/puzzle/layout/responsible_layout_builder.dart';
@@ -48,19 +48,8 @@ class MineCount extends HookConsumerWidget {
                     children: [
                       Text(
                         'M: ',
-                        style: FluentTheme.of(context).typography.display,
                         textAlign: TextAlign.center,
                       ),
-                      // if (!_animOffsetUp.isCompleted)
-                      //   Transform.translate(
-                      //     offset: _animOffsetUp.value,
-                      //     child: Text(
-                      //       '${mines - 1}',
-                      //       style:
-                      //           FluentTheme.of(context).typography.titleLarge,
-                      //       textAlign: TextAlign.center,
-                      //     ),
-                      //   ),
                       Stack(
                         children: [
                           if (pre != 0)
@@ -68,9 +57,6 @@ class MineCount extends HookConsumerWidget {
                               offset: _animOffsetUp.value,
                               child: Text(
                                 '${mines + 1}',
-                                style: FluentTheme.of(context)
-                                    .typography
-                                    .titleLarge,
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -79,9 +65,6 @@ class MineCount extends HookConsumerWidget {
                               offset: _animOffsetDown.value,
                               child: Text(
                                 '$mines',
-                                style: FluentTheme.of(context)
-                                    .typography
-                                    .titleLarge,
                                 textAlign: TextAlign.center,
                               ),
                             ),
