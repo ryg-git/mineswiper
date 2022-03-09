@@ -29,8 +29,6 @@ class MinePuzzleTile extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final size = ref.read(puzzleSizeProvider);
-    // final borderRadius = useState<double>(10.0);
-    // final margin = useState<double>(10.0);
 
     final xController = useAnimationController(
       duration: Duration(
@@ -38,10 +36,10 @@ class MinePuzzleTile extends HookConsumerWidget {
       ),
     );
 
-    // final xtween = useAnimation(Tween<double>(
-    //   begin: 0,
-    //   end: 1,
-    // ).animate(xController));
+    final xtween = useAnimation(Tween<double>(
+      begin: -0.5,
+      end: 0.5,
+    ).animate(xController));
 
     Widget getLetter() {
       if (tile.position.isFlagged) {
@@ -79,15 +77,6 @@ class MinePuzzleTile extends HookConsumerWidget {
 
     return LayoutBuilder(
       builder: (context, constaints) {
-        final fTween = Tween<double>(
-          begin: 0,
-          end: 1,
-        );
-        // final hTween = Tween<double>(
-        //   begin: 0.5,
-        //   end: -0.5,
-        // );
-
         final puzzleSpacing = 25 / size;
 
         return GestureDetector(
@@ -167,7 +156,7 @@ class MinePuzzleTile extends HookConsumerWidget {
           },
           child: CustomPaint(
             painter: TilePainter(
-              move: fTween.evaluate(xController),
+              x: xController.value,
               color: PuzzleColors.primary0,
               y: offset.value,
               xValue: xValue.value,
@@ -238,14 +227,14 @@ class MinePuzzleTile extends HookConsumerWidget {
 }
 
 class TilePainter extends CustomPainter {
-  final double move;
+  final double x;
   final Color color;
   final double y;
   final int xValue;
   final int yValue;
 
   TilePainter({
-    this.move = 0,
+    this.x = 0,
     this.color = Colors.white,
     this.y = 0,
     this.xValue = 1,
@@ -259,14 +248,14 @@ class TilePainter extends CustomPainter {
       path.lineTo(0, size.height + y);
       path.lineTo(
         size.width / 2,
-        size.height * (1 + move) + y,
+        size.height * (1 + x) + y,
       );
       path.lineTo(size.width, size.height + y);
       // path.lineTo(size.width, 3 * size.height / 4);
       path.lineTo(size.width, 0 + y);
       path.lineTo(
         size.width / 2,
-        size.height * move + y,
+        size.height * x + y,
       );
 
       path.lineTo(0, y);
@@ -276,11 +265,11 @@ class TilePainter extends CustomPainter {
 
       path.lineTo(
         size.width / 2,
-        size.height - size.height * move - y,
+        size.height - size.height * x - y,
       );
       path.lineTo(size.width, size.height - y);
       path.lineTo(size.width, -y);
-      path.lineTo(size.width / 2, -move * size.height - y);
+      path.lineTo(size.width / 2, -x * size.height - y);
       path.lineTo(0, -y);
     } else {
       path.lineTo(0, size.height);
