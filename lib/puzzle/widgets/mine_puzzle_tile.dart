@@ -29,7 +29,7 @@ class MinePuzzleTile extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final size = ref.read(puzzleSizeProvider);
-    final borderRadius = useState<double>(10.0);
+    // final borderRadius = useState<double>(10.0);
     // final margin = useState<double>(10.0);
 
     final xController = useAnimationController(
@@ -38,10 +38,10 @@ class MinePuzzleTile extends HookConsumerWidget {
       ),
     );
 
-    final xtween = useAnimation(Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(xController));
+    // final xtween = useAnimation(Tween<double>(
+    //   begin: 0,
+    //   end: 1,
+    // ).animate(xController));
 
     Widget getLetter() {
       if (tile.position.isFlagged) {
@@ -83,10 +83,10 @@ class MinePuzzleTile extends HookConsumerWidget {
           begin: 0,
           end: 1,
         );
-        final hTween = Tween<double>(
-          begin: 0.5,
-          end: -0.5,
-        );
+        // final hTween = Tween<double>(
+        //   begin: 0.5,
+        //   end: -0.5,
+        // );
 
         final puzzleSpacing = 25 / size;
 

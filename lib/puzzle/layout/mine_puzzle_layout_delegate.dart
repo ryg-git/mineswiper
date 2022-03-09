@@ -10,7 +10,7 @@ import 'package:mineswiper/puzzle/widgets/mine_start_section.dart';
 import 'package:mineswiper/puzzle/widgets/puzzle_board.dart';
 
 abstract class _BoardSize {
-  static double small = 312;
+  // static double small = 312;
   static double medium = 424;
   static double large = 472;
 }
