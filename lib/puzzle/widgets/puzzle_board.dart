@@ -21,7 +21,8 @@ class PuzzleBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.count(
       padding: EdgeInsets.zero,
-      // shrinkWrap: true,
+      shrinkWrap: true,
+      primary: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: size,
       mainAxisSpacing: spacing,

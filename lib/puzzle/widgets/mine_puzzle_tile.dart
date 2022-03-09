@@ -8,6 +8,8 @@ import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
 import 'package:mineswiper/styles/text_styles.dart';
 import 'package:mineswiper/utils/theme.dart';
 
+import 'dart:math' show pi, sin;
+
 class MinePuzzleTile extends HookConsumerWidget {
   /// {@macro simple_puzzle_tile}
   const MinePuzzleTile({
@@ -37,8 +39,8 @@ class MinePuzzleTile extends HookConsumerWidget {
     );
 
     final xtween = useAnimation(Tween<double>(
-      begin: -0.5,
-      end: 0.5,
+      begin: 0,
+      end: pi,
     ).animate(xController));
 
     Widget getLetter() {
@@ -83,14 +85,12 @@ class MinePuzzleTile extends HookConsumerWidget {
           onPanUpdate: (details) {
             // final RenderBox box = context.findRenderObject() as RenderBox;
 
-            // final dist = ref.read(puzzleProvider.notifier).WhiteSpaceDiff(tile);
+            final dist = ref.read(puzzleProvider.notifier).WhiteSpaceDiff(tile);
 
-            // final xvalue = dist[0];
-            // final y = dist[1];
+            xValue.value = dist[0];
+            yValue.value = dist[1];
 
             // if (x) {}
-
-            print("local y: ${details.localPosition.dy}");
 
             if (xValue.value == 1) {
               var oy = details.localPosition.dy - constaints.maxHeight;
@@ -99,14 +99,10 @@ class MinePuzzleTile extends HookConsumerWidget {
               }
 
               if (oy > 0 && oy <= (constaints.maxHeight + puzzleSpacing)) {
-                double ox = 0;
-
-                if (oy < (constaints.maxHeight + puzzleSpacing) / 2) {
-                  ox = oy / (constaints.maxHeight + puzzleSpacing);
-                  if (ox > 0.1) xController.value = ox;
-                } else {
-                  ox = 1 - oy / (constaints.maxHeight + puzzleSpacing);
-                  xController.value = ox;
+                final ratio = oy.abs() / (constaints.maxHeight + puzzleSpacing);
+                if (ratio > 0.1) {
+                  xController.value =
+                      oy / (constaints.maxHeight + puzzleSpacing);
                 }
 
                 offset.value = oy;
@@ -119,16 +115,45 @@ class MinePuzzleTile extends HookConsumerWidget {
               if (panStart.value != null) {
                 oy = details.localPosition.dy - panStart.value!.dy;
               }
-              print(oy);
+              // print(oy);
               if (oy <= 0 && oy > -(constaints.maxHeight + puzzleSpacing)) {
-                double ox = 0;
+                final ratio = oy.abs() / (constaints.maxHeight + puzzleSpacing);
+                if (ratio > 0.1) {
+                  xController.value = ratio;
+                }
 
-                if (oy.abs() < (constaints.maxHeight + puzzleSpacing) / 2) {
-                  ox = oy.abs() / (constaints.maxHeight + puzzleSpacing);
-                  if (ox > 0.1) xController.value = ox;
-                } else {
-                  ox = 1 - oy.abs() / (constaints.maxHeight + puzzleSpacing);
-                  xController.value = ox;
+                offset.value = oy.abs();
+              } else if (oy <= -(constaints.maxHeight + puzzleSpacing)) {
+                ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+                xController.reverse();
+              }
+            } else if (yValue.value == 1) {
+              var oy = details.localPosition.dx - constaints.maxWidth;
+              if (panStart.value != null) {
+                oy = details.localPosition.dx - panStart.value!.dx;
+              }
+
+              if (oy > 0 && oy <= (constaints.maxWidth + puzzleSpacing)) {
+                final ratio = oy.abs() / (constaints.maxWidth + puzzleSpacing);
+                if (ratio > 0.1) {
+                  xController.value = ratio;
+                }
+
+                offset.value = oy;
+              } else if (oy > (constaints.maxWidth + puzzleSpacing)) {
+                ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+                xController.reverse();
+              }
+            } else if (yValue.value == -1) {
+              var oy = details.localPosition.dx - constaints.maxWidth;
+              if (panStart.value != null) {
+                oy = details.localPosition.dx - panStart.value!.dx;
+              }
+
+              if (oy <= 0 && oy > -(constaints.maxWidth + puzzleSpacing)) {
+                final ratio = oy.abs() / (constaints.maxWidth + puzzleSpacing);
+                if (ratio > 0.1) {
+                  xController.value = ratio;
                 }
 
                 offset.value = oy.abs();
@@ -137,16 +162,6 @@ class MinePuzzleTile extends HookConsumerWidget {
                 xController.reverse();
               }
             }
-
-            // if (details.delta.dx > 0)
-            //   print("Dragging in +X direction");
-            // else
-            //   print("Dragging in -X direction");
-
-            // if (details.delta.dy > 0)
-            //   print("Dragging in +Y direction");
-            // else
-            //   print("Dragging in -Y direction");
           },
           onPanStart: (details) {
             panStart.value = details.localPosition;
@@ -156,10 +171,12 @@ class MinePuzzleTile extends HookConsumerWidget {
           },
           child: CustomPaint(
             painter: TilePainter(
-              x: xController.value,
+              // x: xController.value,
+              x: sin(xtween) / 3,
               color: PuzzleColors.primary0,
               y: offset.value,
               xValue: xValue.value,
+              yValue: yValue.value,
             ),
             child: Container(
               // color: PuzzleColors.primary0,
@@ -271,6 +288,22 @@ class TilePainter extends CustomPainter {
       path.lineTo(size.width, -y);
       path.lineTo(size.width / 2, -x * size.height - y);
       path.lineTo(0, -y);
+    } else if (yValue == 1) {
+      path.lineTo(y, 0);
+      path.lineTo(size.width * x + y, size.height / 2);
+      path.lineTo(y, size.height);
+      path.lineTo(size.width + y, size.height);
+      path.lineTo(size.width + size.width * x + y, size.height / 2);
+      path.lineTo(size.width + y, 0);
+      path.lineTo(y, 0);
+    } else if (yValue == -1) {
+      path.lineTo(-y, 0);
+      path.lineTo(-size.width * x - y, size.height / 2);
+      path.lineTo(-y, size.height);
+      path.lineTo(size.width - y, size.height);
+      path.lineTo(size.width - size.width * x - y, size.height / 2);
+      path.lineTo(size.width - y, 0);
+      path.lineTo(-y, 0);
     } else {
       path.lineTo(0, size.height);
       path.lineTo(size.width, size.height);
@@ -287,36 +320,3 @@ class TilePainter extends CustomPainter {
     return true;
   }
 }
-
-/*
-    // path.lineTo(size.width / 2, size.height / 4);
-    // path.quadraticBezierTo(0, size.height * 0.8, 0.1 * size.width, size.height);
-    // path.lineTo(size.width * 0.4, size.height * 1.4);
-    // path.quadraticBezierTo(size.width * 0.4, size.height * 1.4,
-    //     size.width * 0.6, size.height * 1.4);
-    // path.arcTo(
-    //   Rect.fromCenter(
-    //     center: Offset(size.width * 0.5, size.height * 1.4),
-    //     width: size.height * 0.2,
-    //     height: size.height * 0.2,
-    //   ),
-    //   0.0,
-    //   pi / 2,
-    //   true,
-    // );
-
-    // path.lineTo(0.9, size.height);
-    // path.quadraticBezierTo(
-    //   0.9 * size.width,
-    //   size.height,
-    //   size.width,
-    //   size.height * 0.8,
-    // );
-
-    // path.lineTo(0.9, size.height);
-    // path.quadraticBezierTo(size.width * 0.4, size.height * 1.4,
-    //     size.width * 0.6, size.height * 1.4);
-
-    // path.lineTo(size.width, 0);
-    // final Rect colorBounds = Rect.fromLTRB(0, 0, size.width, size.height);
-*/
