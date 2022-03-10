@@ -9,7 +9,7 @@ import 'package:mineswiper/models/puzzle_state.dart';
 import 'package:mineswiper/models/tile.dart';
 import 'package:mineswiper/puzzle/layout/mine_puzzle_layout_delegate.dart';
 
-final puzzleSizeProvider = StateProvider<int>((ref) => 10);
+final puzzleSizeProvider = StateProvider<int>((ref) => 4);
 
 final mineCountProvider = StateProvider<int>((ref) => 0);
 
@@ -55,6 +55,18 @@ final puzzleProvider = StateNotifierProvider<PuzzleNotifier, Puzzle>((ref) {
   final puzzleSize = ref.watch(puzzleSizeProvider);
 
   return PuzzleNotifier(read: ref.read)..createPuzzle(puzzleSize);
+});
+
+final keyXState = StateProvider.family<int, String>((ref, id) => 0);
+
+final keyYState = StateProvider.family<int, String>((ref, id) => 0);
+
+final keyStrokeState = StateProvider.family<int, String>((ref, id) => 0);
+
+final keyStrokeStream =
+    StreamProvider.autoDispose.family<String, String>((ref, id) async* {
+  final a = ref.watch(keyStrokeState(id));
+  yield "$id-$a";
 });
 
 class PuzzleNotifier extends StateNotifier<Puzzle> {
@@ -265,7 +277,10 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
         final t = state.tiles
             .firstWhere((element) => element.onBottom(whitespaceTile));
 
-        moveTiles(t, []);
+        read(keyStrokeState("${t.position.x}-${t.position.y}").notifier).state =
+            1;
+
+        // moveTiles(t, []);
       }
     } catch (e) {
       print("Error: $e");
