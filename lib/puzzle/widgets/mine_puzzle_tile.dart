@@ -91,6 +91,8 @@ class MinePuzzleTile extends HookConsumerWidget {
     final keyStrokeX = useState(0);
     final keyStrokeY = useState(0);
 
+    final hoverX = useState(0.5);
+
     final keyStroke =
         ref.watch(keyStrokeStream("${tile.position.x}-${tile.position.y}"));
 
@@ -162,12 +164,14 @@ class MinePuzzleTile extends HookConsumerWidget {
 
               if (oy > 0 && oy <= totalDistH) {
                 final ratio = oy.abs() / totalDistH;
+                hoverX.value = details.localPosition.dx / totalDistW;
                 if (ratio > 0.05) {
                   xController.value = oy / totalDistH;
                 }
               } else if (oy > totalDistH) {
                 ref.read(puzzleProvider.notifier).moveTiles(tile, []);
                 xController.reverse();
+                hoverX.value = 0.5;
               }
             } else if (xValue == -1) {
               var oy = details.localPosition.dy - constaints.maxHeight;
@@ -176,12 +180,14 @@ class MinePuzzleTile extends HookConsumerWidget {
               }
               if (oy <= 0 && oy > -totalDistH) {
                 final ratio = oy.abs() / totalDistH;
+                hoverX.value = details.localPosition.dx / totalDistW;
                 if (ratio > 0.05) {
                   xController.value = ratio;
                 }
               } else if (oy <= -totalDistH) {
                 ref.read(puzzleProvider.notifier).moveTiles(tile, []);
                 xController.reverse();
+                hoverX.value = 0.5;
               }
             } else if (yValue == 1) {
               var oy = details.localPosition.dx - constaints.maxWidth;
@@ -191,12 +197,14 @@ class MinePuzzleTile extends HookConsumerWidget {
 
               if (oy > 0 && oy <= totalDistW) {
                 final ratio = oy.abs() / totalDistW;
+                hoverX.value = details.localPosition.dy / totalDistW;
                 if (ratio > 0.05) {
                   xController.value = ratio;
                 }
               } else if (oy > totalDistW) {
                 ref.read(puzzleProvider.notifier).moveTiles(tile, []);
                 xController.reverse();
+                hoverX.value = 0.5;
               }
             } else if (yValue == -1) {
               var oy = details.localPosition.dx - constaints.maxWidth;
@@ -206,6 +214,7 @@ class MinePuzzleTile extends HookConsumerWidget {
 
               if (oy <= 0 && oy > -totalDistW) {
                 final ratio = oy.abs() / totalDistW;
+                hoverX.value = details.localPosition.dy / totalDistW;
                 if (ratio > 0.05) {
                   xController.value = ratio;
                 }
@@ -225,97 +234,125 @@ class MinePuzzleTile extends HookConsumerWidget {
               ref.read(puzzleProvider.notifier).moveTiles(tile, []);
             } else {
               xController.reverse();
+              hoverX.value = 0.5;
             }
           },
-          child: CustomPaint(
-            painter: TilePainter(
-              // x: xController.value,
-              x: sin(xtween) / 3,
-              color: PuzzleColors.primary0,
-              y: bounceCurve.value
-                  ? ytween * totalDistW
-                  : xController.value * totalDistH,
-              xValue: useKeyStrokeValue.value ? keyStrokeX.value : xValue,
-              yValue: useKeyStrokeValue.value ? keyStrokeY.value : yValue,
-            ),
-            child: Container(
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  // primary: PuzzleColors.white,
-                  textStyle: PuzzleTextStyle.headline2.copyWith(
-                    fontSize: tileFontSize * 3 / size,
+          child: MouseRegion(
+            onHover: (PointerEvent details) {
+              final dist =
+                  ref.read(puzzleProvider.notifier).WhiteSpaceDiff(tile);
+
+              final x = dist[0];
+              final y = dist[1];
+
+              if (x.abs() + y.abs() == 1) {
+                if (x.abs() == 1) {
+                  hoverX.value = details.localPosition.dx / totalDistW;
+                } else if (y.abs() == 1) {
+                  hoverX.value = details.localPosition.dy / totalDistH;
+                }
+              }
+            },
+            child: CustomPaint(
+              painter: TilePainter(
+                // x: xController.value,
+                x: sin(xtween) / 3,
+                color: PuzzleColors.primary0,
+                y: bounceCurve.value
+                    ? ytween * totalDistW
+                    : xController.value * totalDistH,
+                xValue: useKeyStrokeValue.value ? keyStrokeX.value : xValue,
+                yValue: useKeyStrokeValue.value ? keyStrokeY.value : yValue,
+                multiplier: hoverX.value,
+              ),
+              child: Container(
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    // primary: PuzzleColors.white,
+                    textStyle: PuzzleTextStyle.headline2.copyWith(
+                      fontSize: tileFontSize * 3 / size,
+                    ),
+                  ).copyWith(
+                    foregroundColor:
+                        MaterialStateProperty.all(PuzzleColors.tileText),
                   ),
-                ).copyWith(
-                  foregroundColor:
-                      MaterialStateProperty.all(PuzzleColors.tileText),
-                ),
-                onHover: (b) {
-                  final dist =
-                      ref.read(puzzleProvider.notifier).WhiteSpaceDiff(tile);
+                  onHover: (b) {
+                    final dist =
+                        ref.read(puzzleProvider.notifier).WhiteSpaceDiff(tile);
 
-                  final x = dist[0];
-                  final y = dist[1];
+                    final x = dist[0];
+                    final y = dist[1];
 
-                  if (x.abs() + y.abs() == 1) {
-                    ref
-                        .read(keyXState("${tile.position.x}-${tile.position.y}")
-                            .notifier)
-                        .state = x;
-                    ref
-                        .read(keyYState("${tile.position.x}-${tile.position.y}")
-                            .notifier)
-                        .state = y;
-                    bounceCurve.value = true;
-                    if (b) {
-                      xController.animateTo(0.05);
-                      Future.delayed(const Duration(seconds: 3), () {
-                        if (xController.value == 0.05) {
-                          xController.reverse();
-                        }
-                      });
-                    } else {
-                      xController.reverse();
-                    }
-                  }
-                },
-                onPressed: () {
-                  if (ref.read(puzzleProvider).whiteSpaceCreated) {
-                    if (ref.read(puzzleProvider.notifier).isTileMovable(tile)) {
-                      final dist = ref
-                          .read(puzzleProvider.notifier)
-                          .WhiteSpaceDiff(tile);
-
+                    if (x.abs() + y.abs() == 1) {
                       ref
                           .read(
                               keyXState("${tile.position.x}-${tile.position.y}")
                                   .notifier)
-                          .state = dist[0];
+                          .state = x;
                       ref
                           .read(
                               keyYState("${tile.position.x}-${tile.position.y}")
                                   .notifier)
-                          .state = dist[1];
-                      xController.forward().then(
-                        (value) {
-                          ref.read(puzzleProvider.notifier).moveTiles(tile, []);
-                          xController.reverse();
-                        },
-                      );
-                    } else if (tile.position.isVisited) {
-                      ref.read(puzzleProvider.notifier).moveWhiteSpace(tile);
+                          .state = y;
+                      bounceCurve.value = true;
+                      if (b) {
+                        xController.animateTo(0.05);
+                        Future.delayed(const Duration(seconds: 5), () {
+                          if (xController.value == 0.05) {
+                            xController.reverse();
+                            hoverX.value = 0.5;
+                          }
+                        });
+                      } else {
+                        xController.reverse();
+                        hoverX.value = 0.5;
+                      }
                     }
-                  } else {
-                    ref
-                        .read(puzzleProvider.notifier)
-                        .createWhiteSpace(tile, size);
-                  }
-                },
-                onLongPress: () {
-                  if (ref.read(puzzleProvider).whiteSpaceCreated) {
-                    ref.read(puzzleProvider.notifier).flagTile(tile);
-                  }
-                },
-                child: getLetter(),
+                  },
+                  onPressed: () {
+                    if (ref.read(puzzleProvider).whiteSpaceCreated) {
+                      if (ref
+                          .read(puzzleProvider.notifier)
+                          .isTileMovable(tile)) {
+                        final dist = ref
+                            .read(puzzleProvider.notifier)
+                            .WhiteSpaceDiff(tile);
+
+                        ref
+                            .read(keyXState(
+                                    "${tile.position.x}-${tile.position.y}")
+                                .notifier)
+                            .state = dist[0];
+                        ref
+                            .read(keyYState(
+                                    "${tile.position.x}-${tile.position.y}")
+                                .notifier)
+                            .state = dist[1];
+                        xController.forward().then(
+                          (value) {
+                            ref
+                                .read(puzzleProvider.notifier)
+                                .moveTiles(tile, []);
+                            xController.reverse();
+                            hoverX.value = 0.5;
+                          },
+                        );
+                      } else if (tile.position.isVisited) {
+                        ref.read(puzzleProvider.notifier).moveWhiteSpace(tile);
+                      }
+                    } else {
+                      ref
+                          .read(puzzleProvider.notifier)
+                          .createWhiteSpace(tile, size);
+                    }
+                  },
+                  onLongPress: () {
+                    if (ref.read(puzzleProvider).whiteSpaceCreated) {
+                      ref.read(puzzleProvider.notifier).flagTile(tile);
+                    }
+                  },
+                  child: getLetter(),
+                ),
               ),
             ),
           ),
@@ -331,6 +368,7 @@ class TilePainter extends CustomPainter {
   final double y;
   final int xValue;
   final int yValue;
+  final double multiplier;
 
   TilePainter({
     this.x = 0,
@@ -338,7 +376,9 @@ class TilePainter extends CustomPainter {
     this.y = 0,
     this.xValue = 1,
     this.yValue = 0,
+    this.multiplier = 0.5,
   });
+
   @override
   void paint(Canvas canvas, Size size) {
     Path path = Path();
@@ -346,13 +386,13 @@ class TilePainter extends CustomPainter {
     if (xValue == 1) {
       path.lineTo(0, size.height + y);
       path.lineTo(
-        size.width / 2,
+        size.width * multiplier,
         size.height * (1 + x) + y,
       );
       path.lineTo(size.width, size.height + y);
       path.lineTo(size.width, 0 + y);
       path.lineTo(
-        size.width / 2,
+        size.width * multiplier,
         size.height * x + y,
       );
 
@@ -362,27 +402,27 @@ class TilePainter extends CustomPainter {
       path.lineTo(0, size.height - y);
 
       path.lineTo(
-        size.width / 2,
+        size.width * multiplier,
         size.height - size.height * x - y,
       );
       path.lineTo(size.width, size.height - y);
       path.lineTo(size.width, -y);
-      path.lineTo(size.width / 2, -x * size.height - y);
+      path.lineTo(size.width * multiplier, -x * size.height - y);
       path.lineTo(0, -y);
     } else if (yValue == 1) {
       path.lineTo(y, 0);
-      path.lineTo(size.width * x + y, size.height / 2);
+      path.lineTo(size.width * x + y, size.height * multiplier);
       path.lineTo(y, size.height);
       path.lineTo(size.width + y, size.height);
-      path.lineTo(size.width + size.width * x + y, size.height / 2);
+      path.lineTo(size.width + size.width * x + y, size.height * multiplier);
       path.lineTo(size.width + y, 0);
       path.lineTo(y, 0);
     } else if (yValue == -1) {
       path.lineTo(-y, 0);
-      path.lineTo(-size.width * x - y, size.height / 2);
+      path.lineTo(-size.width * x - y, size.height * multiplier);
       path.lineTo(-y, size.height);
       path.lineTo(size.width - y, size.height);
-      path.lineTo(size.width - size.width * x - y, size.height / 2);
+      path.lineTo(size.width - size.width * x - y, size.height * multiplier);
       path.lineTo(size.width - y, 0);
       path.lineTo(-y, 0);
     } else {
