@@ -161,71 +161,40 @@ class _ShowMessage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final puzzleState = ref.watch(puzzleStateProvider);
+    final puzzleStateFailed =
+        ref.watch(puzzleStateProvider.select((value) => value.puzzle.failed));
+    final whiteSpaceCreated = ref.watch(
+        puzzleStateProvider.select((value) => value.puzzle.whiteSpaceCreated));
     final remainingTiles = ref.watch(remainingProvider);
     final l10n = context.l10n;
-    final isMounted = useIsMounted();
-    final isOpen = useState(false);
 
-    useEffect(
-      () {
-        Future.delayed(
-          Duration.zero,
-          () {
-            if (!isOpen.value) {
-              if (isMounted() && puzzleState.puzzle.failed) {
-                showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                    title: Text(l10n.lost),
-                    actions: [
-                      TextButton(
-                        child: Text(l10n.ok),
-                        onPressed: () {
-                          ref.read(puzzleProvider.notifier).createPuzzle(
-                                ref.read(puzzleSizeProvider),
-                              );
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                ).then((v) => isOpen.value = true);
-              } else if (isMounted() && remainingTiles == 0) {
-                showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                    title: Text(l10n.won),
-                    actions: [
-                      TextButton(
-                        child: Text(l10n.ok),
-                        onPressed: () {
-                          ref.read(puzzleProvider.notifier).createPuzzle(
-                                ref.read(puzzleSizeProvider),
-                              );
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                ).then((v) => isOpen.value = true);
-                ;
-              }
-            }
-            isOpen.value = false;
-          },
+    Widget getMessage() {
+      if (puzzleStateFailed) {
+        return Chip(
+          label: Text(
+            l10n.lost,
+            textAlign: TextAlign.center,
+          ),
         );
-        return;
-      },
-    );
+      } else if (remainingTiles == 0) {
+        return Chip(
+          label: Text(
+            l10n.won,
+            textAlign: TextAlign.center,
+          ),
+        );
+      } else if (!whiteSpaceCreated) {
+        return Chip(
+          label: Text(
+            l10n.tapTile,
+            textAlign: TextAlign.center,
+          ),
+        );
+      } else {
+        return SizedBox();
+      }
+    }
 
-    return puzzleState.puzzle.whiteSpaceCreated
-        ? SizedBox()
-        : Chip(
-            label: Text(
-              l10n.tapTile,
-              textAlign: TextAlign.center,
-            ),
-          );
+    return getMessage();
   }
 }
