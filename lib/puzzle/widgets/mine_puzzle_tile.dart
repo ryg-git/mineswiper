@@ -174,7 +174,6 @@ class MinePuzzleTile extends HookConsumerWidget {
               if (panStart.value != null) {
                 oy = details.localPosition.dy - panStart.value!.dy;
               }
-              // print(oy);
               if (oy <= 0 && oy > -totalDistH) {
                 final ratio = oy.abs() / totalDistH;
                 if (ratio > 0.05) {
@@ -240,7 +239,6 @@ class MinePuzzleTile extends HookConsumerWidget {
               yValue: useKeyStrokeValue.value ? keyStrokeY.value : yValue,
             ),
             child: Container(
-              // color: PuzzleColors.primary0,
               child: TextButton(
                 style: TextButton.styleFrom(
                   // primary: PuzzleColors.white,
@@ -250,11 +248,6 @@ class MinePuzzleTile extends HookConsumerWidget {
                 ).copyWith(
                   foregroundColor:
                       MaterialStateProperty.all(PuzzleColors.tileText),
-                  // backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                  //   (states) {
-                  //     return PuzzleColors.primary0;
-                  //   },
-                  // ),
                 ),
                 onHover: (b) {
                   final dist =
@@ -262,9 +255,6 @@ class MinePuzzleTile extends HookConsumerWidget {
 
                   final x = dist[0];
                   final y = dist[1];
-
-                  print("x: $x");
-                  print("y: $y");
 
                   if (x.abs() + y.abs() == 1) {
                     ref
@@ -278,6 +268,11 @@ class MinePuzzleTile extends HookConsumerWidget {
                     bounceCurve.value = true;
                     if (b) {
                       xController.animateTo(0.05);
+                      Future.delayed(const Duration(seconds: 3), () {
+                        if (xController.value == 0.05) {
+                          xController.reverse();
+                        }
+                      });
                     } else {
                       xController.reverse();
                     }
@@ -300,9 +295,12 @@ class MinePuzzleTile extends HookConsumerWidget {
                               keyYState("${tile.position.x}-${tile.position.y}")
                                   .notifier)
                           .state = dist[1];
-                      xController.forward().then((value) => ref
-                          .read(puzzleProvider.notifier)
-                          .moveTiles(tile, []));
+                      xController.forward().then(
+                        (value) {
+                          ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+                          xController.reverse();
+                        },
+                      );
                     } else if (tile.position.isVisited) {
                       ref.read(puzzleProvider.notifier).moveWhiteSpace(tile);
                     }
@@ -352,7 +350,6 @@ class TilePainter extends CustomPainter {
         size.height * (1 + x) + y,
       );
       path.lineTo(size.width, size.height + y);
-      // path.lineTo(size.width, 3 * size.height / 4);
       path.lineTo(size.width, 0 + y);
       path.lineTo(
         size.width / 2,
