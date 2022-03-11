@@ -88,7 +88,6 @@ class PuzzleBoard extends HookConsumerWidget {
     );
 
     void _handleKeyEvent(RawKeyEvent event) {
-      print("key ${event.logicalKey}");
       if (ref.read(puzzleStateProvider).puzzle.whiteSpaceCreated &&
           !ref.read(puzzleStateProvider).puzzle.failed) {
         ref.read(puzzleProvider.notifier).handleKeyEvent(event);
