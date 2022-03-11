@@ -66,7 +66,15 @@ final keyStrokeState = StateProvider.family<int, String>((ref, id) => 0);
 final keyStrokeStream =
     StreamProvider.autoDispose.family<String, String>((ref, id) async* {
   final a = ref.watch(keyStrokeState(id));
-  yield "$id-$a";
+  if (a == 3) {
+    yield "X1";
+  } else if (a == 4) {
+    yield "Y-1";
+  } else if (a == 2) {
+    yield "Y1";
+  } else if (a == 1) {
+    yield "X-1";
+  }
 });
 
 class PuzzleNotifier extends StateNotifier<Puzzle> {
@@ -261,26 +269,26 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
       } else if (event.data.logicalKey.keyLabel == "Arrow Left") {
         final t =
             state.tiles.firstWhere((element) => element.onLeft(whitespaceTile));
-
-        moveTiles(t, []);
+        read(keyStrokeState("${t.position.x}-${t.position.y}").notifier).state =
+            4;
       } else if (event.data.logicalKey.keyLabel == "Arrow Right") {
         final t = state.tiles
             .firstWhere((element) => element.onRight(whitespaceTile));
 
-        moveTiles(t, []);
+        read(keyStrokeState("${t.position.x}-${t.position.y}").notifier).state =
+            2;
       } else if (event.data.logicalKey.keyLabel == "Arrow Up") {
         final t =
             state.tiles.firstWhere((element) => element.onTop(whitespaceTile));
 
-        moveTiles(t, []);
+        read(keyStrokeState("${t.position.x}-${t.position.y}").notifier).state =
+            1;
       } else if (event.data.logicalKey.keyLabel == "Arrow Down") {
         final t = state.tiles
             .firstWhere((element) => element.onBottom(whitespaceTile));
 
         read(keyStrokeState("${t.position.x}-${t.position.y}").notifier).state =
-            1;
-
-        // moveTiles(t, []);
+            3;
       }
     } catch (e) {
       print("Error: $e");
@@ -327,6 +335,8 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
       tilesToSwap.add(tile);
       _swapTiles(tilesToSwap);
     }
+    read(keyStrokeState("${tile.position.x}-${tile.position.y}").notifier)
+        .state = 0;
   }
 
   void _swapTiles(List<Tile> tilesToSwap) {
