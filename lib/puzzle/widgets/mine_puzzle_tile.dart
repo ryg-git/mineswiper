@@ -104,6 +104,14 @@ class MinePuzzleTile extends HookConsumerWidget {
           keyStrokeY.value = 0;
           xController.forward().then((value) {
             ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+            ref
+                .read(
+                    keyXState("${tile.position.x}-${tile.position.y}").notifier)
+                .state = 0;
+            ref
+                .read(
+                    keyYState("${tile.position.x}-${tile.position.y}").notifier)
+                .state = 0;
           });
         } else if (d == "Y-1") {
           useKeyStrokeValue.value = true;
@@ -111,6 +119,14 @@ class MinePuzzleTile extends HookConsumerWidget {
           keyStrokeY.value = -1;
           xController.forward().then((value) {
             ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+            ref
+                .read(
+                    keyXState("${tile.position.x}-${tile.position.y}").notifier)
+                .state = 0;
+            ref
+                .read(
+                    keyYState("${tile.position.x}-${tile.position.y}").notifier)
+                .state = 0;
           });
         } else if (d == "X-1") {
           useKeyStrokeValue.value = true;
@@ -118,6 +134,14 @@ class MinePuzzleTile extends HookConsumerWidget {
           keyStrokeY.value = 0;
           xController.forward().then((value) {
             ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+            ref
+                .read(
+                    keyXState("${tile.position.x}-${tile.position.y}").notifier)
+                .state = 0;
+            ref
+                .read(
+                    keyYState("${tile.position.x}-${tile.position.y}").notifier)
+                .state = 0;
           });
         } else if (d == "Y1") {
           useKeyStrokeValue.value = true;
@@ -125,6 +149,14 @@ class MinePuzzleTile extends HookConsumerWidget {
           keyStrokeY.value = 1;
           xController.forward().then((value) {
             ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+            ref
+                .read(
+                    keyXState("${tile.position.x}-${tile.position.y}").notifier)
+                .state = 0;
+            ref
+                .read(
+                    keyYState("${tile.position.x}-${tile.position.y}").notifier)
+                .state = 0;
           });
         } else {
           useKeyStrokeValue.value = false;
@@ -138,6 +170,8 @@ class MinePuzzleTile extends HookConsumerWidget {
         final puzzleSpacing = 25 / size;
         final totalDistH = (constaints.maxHeight + puzzleSpacing);
         final totalDistW = (constaints.maxWidth + puzzleSpacing);
+
+        final sinx = sin(xtween);
 
         return GestureDetector(
           onPanUpdate: (details) {
@@ -172,6 +206,14 @@ class MinePuzzleTile extends HookConsumerWidget {
                 ref.read(puzzleProvider.notifier).moveTiles(tile, []);
                 xController.reverse();
                 hoverX.value = 0.5;
+                ref
+                    .read(keyXState("${tile.position.x}-${tile.position.y}")
+                        .notifier)
+                    .state = 0;
+                ref
+                    .read(keyYState("${tile.position.x}-${tile.position.y}")
+                        .notifier)
+                    .state = 0;
               }
             } else if (xValue == -1) {
               var oy = details.localPosition.dy - constaints.maxHeight;
@@ -188,6 +230,14 @@ class MinePuzzleTile extends HookConsumerWidget {
                 ref.read(puzzleProvider.notifier).moveTiles(tile, []);
                 xController.reverse();
                 hoverX.value = 0.5;
+                ref
+                    .read(keyXState("${tile.position.x}-${tile.position.y}")
+                        .notifier)
+                    .state = 0;
+                ref
+                    .read(keyYState("${tile.position.x}-${tile.position.y}")
+                        .notifier)
+                    .state = 0;
               }
             } else if (yValue == 1) {
               var oy = details.localPosition.dx - constaints.maxWidth;
@@ -205,6 +255,14 @@ class MinePuzzleTile extends HookConsumerWidget {
                 ref.read(puzzleProvider.notifier).moveTiles(tile, []);
                 xController.reverse();
                 hoverX.value = 0.5;
+                ref
+                    .read(keyXState("${tile.position.x}-${tile.position.y}")
+                        .notifier)
+                    .state = 0;
+                ref
+                    .read(keyYState("${tile.position.x}-${tile.position.y}")
+                        .notifier)
+                    .state = 0;
               }
             } else if (yValue == -1) {
               var oy = details.localPosition.dx - constaints.maxWidth;
@@ -220,6 +278,14 @@ class MinePuzzleTile extends HookConsumerWidget {
                 }
               } else if (oy <= -totalDistH) {
                 ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+                ref
+                    .read(keyXState("${tile.position.x}-${tile.position.y}")
+                        .notifier)
+                    .state = 0;
+                ref
+                    .read(keyYState("${tile.position.x}-${tile.position.y}")
+                        .notifier)
+                    .state = 0;
                 // xController.reverse();
               }
             }
@@ -232,9 +298,25 @@ class MinePuzzleTile extends HookConsumerWidget {
             bounceCurve.value = true;
             if (xController.value > 0.4) {
               ref.read(puzzleProvider.notifier).moveTiles(tile, []);
+              ref
+                  .read(keyXState("${tile.position.x}-${tile.position.y}")
+                      .notifier)
+                  .state = 0;
+              ref
+                  .read(keyYState("${tile.position.x}-${tile.position.y}")
+                      .notifier)
+                  .state = 0;
             } else {
               xController.reverse();
               hoverX.value = 0.5;
+              ref
+                  .read(keyXState("${tile.position.x}-${tile.position.y}")
+                      .notifier)
+                  .state = 0;
+              ref
+                  .read(keyYState("${tile.position.x}-${tile.position.y}")
+                      .notifier)
+                  .state = 0;
             }
           },
           child: MouseRegion(
@@ -264,6 +346,7 @@ class MinePuzzleTile extends HookConsumerWidget {
                 xValue: useKeyStrokeValue.value ? keyStrokeX.value : xValue,
                 yValue: useKeyStrokeValue.value ? keyStrokeY.value : yValue,
                 multiplier: hoverX.value,
+                tileGap: puzzleSpacing,
               ),
               child: Container(
                 child: TextButton(
@@ -301,11 +384,31 @@ class MinePuzzleTile extends HookConsumerWidget {
                           if (xController.value == 0.05) {
                             xController.reverse();
                             hoverX.value = 0.5;
+                            ref
+                                .read(keyXState(
+                                        "${tile.position.x}-${tile.position.y}")
+                                    .notifier)
+                                .state = 0;
+                            ref
+                                .read(keyYState(
+                                        "${tile.position.x}-${tile.position.y}")
+                                    .notifier)
+                                .state = 0;
                           }
                         });
                       } else {
                         xController.reverse();
                         hoverX.value = 0.5;
+                        ref
+                            .read(keyXState(
+                                    "${tile.position.x}-${tile.position.y}")
+                                .notifier)
+                            .state = 0;
+                        ref
+                            .read(keyYState(
+                                    "${tile.position.x}-${tile.position.y}")
+                                .notifier)
+                            .state = 0;
                       }
                     }
                   },
@@ -335,6 +438,16 @@ class MinePuzzleTile extends HookConsumerWidget {
                                 .moveTiles(tile, []);
                             xController.reverse();
                             hoverX.value = 0.5;
+                            ref
+                                .read(keyXState(
+                                        "${tile.position.x}-${tile.position.y}")
+                                    .notifier)
+                                .state = 0;
+                            ref
+                                .read(keyYState(
+                                        "${tile.position.x}-${tile.position.y}")
+                                    .notifier)
+                                .state = 0;
                           },
                         );
                       } else if (tile.position.isVisited) {
@@ -369,6 +482,7 @@ class TilePainter extends CustomPainter {
   final int xValue;
   final int yValue;
   final double multiplier;
+  final double tileGap;
 
   TilePainter({
     this.x = 0,
@@ -377,11 +491,14 @@ class TilePainter extends CustomPainter {
     this.xValue = 1,
     this.yValue = 0,
     this.multiplier = 0.5,
+    required this.tileGap,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     Path path = Path();
+
+    final arcCornerHeight = sin(pi / 4) * tileGap;
 
     if (xValue == 1) {
       path.lineTo(0, size.height + y);
@@ -426,9 +543,37 @@ class TilePainter extends CustomPainter {
       path.lineTo(size.width - y, 0);
       path.lineTo(-y, 0);
     } else {
-      path.lineTo(0, size.height);
-      path.lineTo(size.width, size.height);
-      path.lineTo(size.width, 0);
+      path.lineTo(0, size.height - arcCornerHeight);
+      path.quadraticBezierTo(
+        0,
+        size.height,
+        arcCornerHeight,
+        size.height,
+      );
+      path.lineTo(size.width - arcCornerHeight, size.height);
+      path.quadraticBezierTo(
+        size.width,
+        size.height,
+        size.width,
+        size.height - arcCornerHeight,
+      );
+      path.lineTo(
+        size.width,
+        arcCornerHeight,
+      );
+      path.quadraticBezierTo(
+        size.width,
+        0,
+        size.width - arcCornerHeight,
+        0,
+      );
+      path.lineTo(arcCornerHeight, 0);
+      path.quadraticBezierTo(
+        0,
+        0,
+        0,
+        arcCornerHeight,
+      );
     }
 
     final Paint paint = new Paint()..color = color;
