@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/puzzle/layout/responsible_layout_builder.dart';
 import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
 import 'package:mineswiper/utils/screen_dimensions.dart';
+import 'package:mineswiper/utils/theme.dart';
 
 class MineCount extends HookConsumerWidget {
   const MineCount({Key? key}) : super(key: key);
@@ -38,42 +39,45 @@ class MineCount extends HookConsumerWidget {
     Widget getWidget(double dim) {
       return Padding(
         padding: const EdgeInsets.all(8.0),
-        child: mines == 0
-            ? const SizedBox()
-            : AnimatedBuilder(
-                animation: animationController,
-                builder: (context, child) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'M: ',
-                        textAlign: TextAlign.center,
+        child: AnimatedBuilder(
+          animation: animationController,
+          builder: (context, child) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image(
+                    image: AssetImage('assets/images/mine.png'),
+                    fit: BoxFit.fitHeight,
+                    height: 30,
+                    color: context.theme.primaryColor,
+                  ),
+                ),
+                Stack(
+                  children: [
+                    if (pre != 0)
+                      Transform.translate(
+                        offset: _animOffsetUp.value,
+                        child: Text(
+                          '${mines + 1}',
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      Stack(
-                        children: [
-                          if (pre != 0)
-                            Transform.translate(
-                              offset: _animOffsetUp.value,
-                              child: Text(
-                                '${mines + 1}',
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          if (mines >= 0)
-                            Transform.translate(
-                              offset: _animOffsetDown.value,
-                              child: Text(
-                                '$mines',
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                        ],
+                    if (mines >= 0)
+                      Transform.translate(
+                        offset: _animOffsetDown.value,
+                        child: Text(
+                          '$mines',
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ],
-                  );
-                },
-              ),
+                  ],
+                ),
+              ],
+            );
+          },
+        ),
       );
     }
 
