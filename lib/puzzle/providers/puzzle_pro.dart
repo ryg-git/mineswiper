@@ -77,6 +77,14 @@ final keyStrokeStream =
   }
 });
 
+final instructionState = StateProvider.family<String, String>((ref, id) => "");
+
+final instructionStream =
+    StreamProvider.autoDispose.family<String, String>((ref, id) async* {
+  final a = ref.watch(instructionState(id));
+  yield a;
+});
+
 class PuzzleNotifier extends StateNotifier<Puzzle> {
   final Random random = Random();
 
@@ -292,6 +300,54 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
       }
     } catch (e) {
       print("Error: $e");
+    }
+  }
+
+  void showHint() {
+    final whitespaceTile = getWhitespaceTile();
+    final List<Tile> mines = state.tiles
+        .where(
+          (element) =>
+              whitespaceTile.position.isNearTile(element.position) &&
+              !element.position.showHint &&
+              element.position.isMine,
+        )
+        .toList();
+
+    final len = mines.length;
+
+    if (len > 0) {
+      final mineInd = random.nextInt(len);
+
+      final t = mines[mineInd];
+
+      state = state.copyWith(
+        tiles: state.tiles.map(
+          (e) {
+            if (e.compareOnlyPosition(t)) {
+              return e.copyWith(
+                position: e.position.copyWith(
+                  showHint: true,
+                ),
+              );
+            }
+            return e;
+          },
+        ).toList(),
+      );
+      read(positionTileProvider(
+        "${t.position.x}-${t.position.y}",
+      ).notifier)
+          .state = t.copyWith(
+        position: t.position.copyWith(
+          showHint: true,
+        ),
+      );
+    } else {
+      read(instructionState(
+                  "${whitespaceTile.position.x}-${whitespaceTile.position.y}")
+              .notifier)
+          .state = "NoHint";
     }
   }
 

@@ -17,6 +17,7 @@ class Position with _$Position {
     @Default(false) bool isFlagged,
     @Default(false) bool isVisited,
     @Default(false) bool isDefused,
+    @Default(false) bool showHint,
   }) = _Position;
 
   bool isNearTile(Position other) {

@@ -5,6 +5,7 @@ import 'package:mineswiper/colors/colors.dart';
 import 'package:mineswiper/models/puzzle_state.dart';
 import 'package:mineswiper/models/tile.dart';
 import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
+import 'package:mineswiper/puzzle/widgets/mine_hint.dart';
 import 'package:mineswiper/styles/text_styles.dart';
 import 'package:mineswiper/utils/theme.dart';
 
@@ -60,6 +61,8 @@ class MinePuzzleTile extends HookConsumerWidget {
             color: context.theme.primaryColor,
           ),
         );
+      } else if (tile.position.showHint) {
+        return MineHint();
       } else if (tile.position.isVisited) {
         if (tile.position.isMine) {
           return Text(
@@ -71,6 +74,7 @@ class MinePuzzleTile extends HookConsumerWidget {
         } else {
           return Text(
             '${tile.position.mines}',
+            textAlign: TextAlign.center,
           );
         }
       } else {
@@ -170,8 +174,6 @@ class MinePuzzleTile extends HookConsumerWidget {
         final puzzleSpacing = 25 / size;
         final totalDistH = (constaints.maxHeight + puzzleSpacing);
         final totalDistW = (constaints.maxWidth + puzzleSpacing);
-
-        final sinx = sin(xtween);
 
         return GestureDetector(
           onPanUpdate: (details) {
