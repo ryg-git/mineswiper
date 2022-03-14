@@ -59,11 +59,13 @@ class MinePuzzleTile extends HookConsumerWidget {
       ),
     );
 
+    final memory = ref.read(memoryMode);
+
     Widget getLetter() {
       if (tile.position.isVisited) {
-        if (tile.position.isMine) {
+        if (memory) {
           return Text(
-            '0',
+            '.',
             style: TextStyle(
               color: PuzzleColors.green,
               fontFamily: "FredokaOne",
@@ -71,15 +73,26 @@ class MinePuzzleTile extends HookConsumerWidget {
             ),
           );
         } else {
-          return Text(
-            '${tile.position.mines}',
-            textAlign: TextAlign.center,
-            style: PuzzleTextStyle.headline2.copyWith(
-              fontSize: tileFontSize * 5 / size,
-              fontFamily: "FredokaOne",
-              color: context.theme.backgroundColor,
-            ),
-          );
+          if (tile.position.isMine) {
+            return Text(
+              '0',
+              style: TextStyle(
+                color: PuzzleColors.green,
+                fontFamily: "FredokaOne",
+                fontSize: tileFontSize * 5 / size,
+              ),
+            );
+          } else {
+            return Text(
+              '${tile.position.mines}',
+              textAlign: TextAlign.center,
+              style: PuzzleTextStyle.headline2.copyWith(
+                fontSize: tileFontSize * 5 / size,
+                fontFamily: "FredokaOne",
+                color: context.theme.backgroundColor,
+              ),
+            );
+          }
         }
       } else {
         return MineFlag(
@@ -352,7 +365,7 @@ class MinePuzzleTile extends HookConsumerWidget {
                 painter: TilePainter(
                   // x: xController.value,
                   x: sin(xtween) / 3,
-                  color: PuzzleColors.primary0,
+                  color: context.theme.primaryColor,
                   y: bounceCurve.value
                       ? ytween * totalDistW
                       : xController.value * totalDistH,

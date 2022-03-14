@@ -18,6 +18,8 @@ final puzzleStartTimeProvider = StateProvider<int>((ref) => 0);
 final puzzleEndTimeProvider = StateProvider<int>((ref) => 0);
 final puzzleSecondsProvider = StateProvider<int>((ref) => 0);
 
+final memoryMode = StateProvider<bool>((ref) => false);
+
 final timerProvider = StreamProvider.autoDispose<int>(
   (ref) {
     final stop = ref.watch(
@@ -178,6 +180,8 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
         );
       }
     }
+
+    read(remainingProvider.notifier).state = correctPositions.length;
 
     final _allMines = correctPositions
         .where(
@@ -559,8 +563,8 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
         ).notifier)
             .state = correctPositions.last;
       }
-      read(mineCountProvider.notifier).state = 0;
-      read(remainingProvider.notifier).state = correctPositions.length;
+      // read(mineCountProvider.notifier).state = 0;
+      // read(remainingProvider.notifier).state = correctPositions.length;
     }
 
     state = Puzzle(
