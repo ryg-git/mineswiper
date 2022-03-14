@@ -19,6 +19,7 @@ dependencies:
   google_fonts: ^2.3.1
   hooks_riverpod: ^1.0.3
   intl: ^0.17.0
+  rive: ^0.8.1
   throttling: ^1.0.0
 
 dev_dependencies:
@@ -33,3 +34,9 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/rive/
+
+  fonts:
+    - family: FredokaOne
+      fonts:
+        - asset: assets/fonts/FredokaOne-Regular.ttf
