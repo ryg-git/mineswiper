@@ -5,7 +5,7 @@ import 'package:mineswiper/colors/colors.dart';
 import 'package:mineswiper/models/puzzle_state.dart';
 import 'package:mineswiper/models/tile.dart';
 import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
-import 'package:mineswiper/puzzle/widgets/mine_hint.dart';
+import 'package:mineswiper/puzzle/widgets/mine_flag.dart';
 import 'package:mineswiper/styles/text_styles.dart';
 import 'package:mineswiper/utils/theme.dart';
 
@@ -39,6 +39,12 @@ class MinePuzzleTile extends HookConsumerWidget {
       ),
     );
 
+    final scaleController = useAnimationController(
+      duration: Duration(
+        milliseconds: 200,
+      ),
+    );
+
     final xtween = useAnimation(Tween<double>(
       begin: 0,
       end: pi,
@@ -54,16 +60,7 @@ class MinePuzzleTile extends HookConsumerWidget {
     );
 
     Widget getLetter() {
-      if (tile.position.isFlagged) {
-        return Text(
-          'F',
-          style: TextStyle(
-            color: context.theme.primaryColor,
-          ),
-        );
-      } else if (tile.position.showHint) {
-        return MineHint();
-      } else if (tile.position.isVisited) {
+      if (tile.position.isVisited) {
         if (tile.position.isMine) {
           return Text(
             'M',
@@ -78,7 +75,9 @@ class MinePuzzleTile extends HookConsumerWidget {
           );
         }
       } else {
-        return const Text("");
+        return MineFlag(
+          currentTile: tile,
+        );
       }
     }
 
@@ -337,20 +336,24 @@ class MinePuzzleTile extends HookConsumerWidget {
                 }
               }
             },
-            child: CustomPaint(
-              painter: TilePainter(
-                // x: xController.value,
-                x: sin(xtween) / 3,
-                color: PuzzleColors.primary0,
-                y: bounceCurve.value
-                    ? ytween * totalDistW
-                    : xController.value * totalDistH,
-                xValue: useKeyStrokeValue.value ? keyStrokeX.value : xValue,
-                yValue: useKeyStrokeValue.value ? keyStrokeY.value : yValue,
-                multiplier: hoverX.value,
-                tileGap: puzzleSpacing,
-              ),
-              child: Container(
+            child: ScaleTransition(
+              scale: Tween<double>(
+                begin: 1,
+                end: 0,
+              ).animate(scaleController),
+              child: CustomPaint(
+                painter: TilePainter(
+                  // x: xController.value,
+                  x: sin(xtween) / 3,
+                  color: PuzzleColors.primary0,
+                  y: bounceCurve.value
+                      ? ytween * totalDistW
+                      : xController.value * totalDistH,
+                  xValue: useKeyStrokeValue.value ? keyStrokeX.value : xValue,
+                  yValue: useKeyStrokeValue.value ? keyStrokeY.value : yValue,
+                  multiplier: hoverX.value,
+                  tileGap: puzzleSpacing,
+                ),
                 child: TextButton(
                   style: TextButton.styleFrom(
                     // primary: PuzzleColors.white,
@@ -360,6 +363,7 @@ class MinePuzzleTile extends HookConsumerWidget {
                   ).copyWith(
                     foregroundColor:
                         MaterialStateProperty.all(PuzzleColors.tileText),
+                    alignment: Alignment.center,
                   ),
                   onHover: (b) {
                     final dist =
@@ -456,9 +460,9 @@ class MinePuzzleTile extends HookConsumerWidget {
                         ref.read(puzzleProvider.notifier).moveWhiteSpace(tile);
                       }
                     } else {
-                      ref
+                      scaleController.forward().then((value) => ref
                           .read(puzzleProvider.notifier)
-                          .createWhiteSpace(tile, size);
+                          .createWhiteSpace(tile, size));
                     }
                   },
                   onLongPress: () {
@@ -466,7 +470,7 @@ class MinePuzzleTile extends HookConsumerWidget {
                       ref.read(puzzleProvider.notifier).flagTile(tile);
                     }
                   },
-                  child: getLetter(),
+                  child: xController.isAnimating ? SizedBox() : getLetter(),
                 ),
               ),
             ),

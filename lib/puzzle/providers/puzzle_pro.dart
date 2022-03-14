@@ -9,15 +9,38 @@ import 'package:mineswiper/models/puzzle_state.dart';
 import 'package:mineswiper/models/tile.dart';
 import 'package:mineswiper/puzzle/layout/mine_puzzle_layout_delegate.dart';
 
-final puzzleSizeProvider = StateProvider<int>((ref) => 5);
+final puzzleSizeProvider = StateProvider<int>((ref) => 12);
 
 final mineCountProvider = StateProvider<int>((ref) => 0);
 
+final hintCountProvider = StateProvider<int>((ref) => 0);
+final puzzleStartTimeProvider = StateProvider<int>((ref) => 0);
+final puzzleEndTimeProvider = StateProvider<int>((ref) => 0);
+final puzzleSecondsProvider = StateProvider<int>((ref) => 0);
+
 final timerProvider = StreamProvider.autoDispose<int>(
-  (ref) => Stream.periodic(
-    const Duration(seconds: 1),
-    (i) => i,
-  ),
+  (ref) {
+    final stop = ref.watch(
+      puzzleProvider.select(
+        (value) => value.whiteSpaceCreated && !value.failed && !value.solved,
+      ),
+    );
+
+    var seconds = ref.read(puzzleSecondsProvider);
+
+    return stop
+        ? Stream.periodic(
+            const Duration(seconds: 1),
+            (i) {
+              if (ref.read(mineCountProvider) == 0) {
+                return seconds;
+              }
+              ref.read(puzzleSecondsProvider.notifier).state = ++seconds;
+              return seconds;
+            },
+          )
+        : Stream.empty();
+  },
 );
 
 final remainingProvider = StateProvider<int>((ref) => -1);
@@ -77,6 +100,23 @@ final keyStrokeStream =
   }
 });
 
+final beginCoolDown = StateProvider((ref) {
+  return false;
+});
+
+final coolDownTime = StreamProvider((ref) {
+  final coolDown = ref.watch(beginCoolDown);
+
+  var milli = 0;
+
+  return milli < 51 && coolDown
+      ? Stream.periodic(Duration(milliseconds: 100), (_) {
+          if (milli > 49) ref.read(beginCoolDown.notifier).state = false;
+          return milli++;
+        }).take(51)
+      : Stream.empty();
+});
+
 final instructionState = StateProvider.family<String, String>((ref, id) => "");
 
 final instructionStream =
@@ -123,7 +163,7 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
   }
 
   void createWhiteSpace(Tile tile, int size) {
-    final mineNumber = (size * size) ~/ 5;
+    final mineNumber = (size * size) * 4 ~/ 10;
     final oddOrEven = random.nextBool();
 
     final correctPositions = <Position>[];
@@ -193,6 +233,9 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
     read(remainingProvider.notifier).state--;
 
     read(mineCountProvider.notifier).state = mines.length;
+
+    read(puzzleStartTimeProvider.notifier).state =
+        DateTime.now().millisecondsSinceEpoch;
 
     state = Puzzle(
       tiles: tiles,
@@ -322,50 +365,54 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
   }
 
   void showHint() {
-    final whitespaceTile = getWhitespaceTile();
-    final List<Tile> mines = state.tiles
-        .where(
-          (element) =>
-              whitespaceTile.position.isNearTile(element.position) &&
-              !element.position.showHint &&
-              element.position.isMine,
-        )
-        .toList();
+    if (!read(beginCoolDown)) {
+      final whitespaceTile = getWhitespaceTile();
+      final List<Tile> mines = state.tiles
+          .where(
+            (element) =>
+                whitespaceTile.position.isNearTile(element.position) &&
+                !element.position.showHint &&
+                element.position.isMine,
+          )
+          .toList();
 
-    final len = mines.length;
+      final len = mines.length;
 
-    if (len > 0) {
-      final mineInd = random.nextInt(len);
+      if (len > 0) {
+        final mineInd = random.nextInt(len);
 
-      final t = mines[mineInd];
+        final t = mines[mineInd];
 
-      state = state.copyWith(
-        tiles: state.tiles.map(
-          (e) {
-            if (e.compareOnlyPosition(t)) {
-              return e.copyWith(
-                position: e.position.copyWith(
-                  showHint: true,
-                ),
-              );
-            }
-            return e;
-          },
-        ).toList(),
-      );
-      read(positionTileProvider(
-        "${t.position.x}-${t.position.y}",
-      ).notifier)
-          .state = t.copyWith(
-        position: t.position.copyWith(
-          showHint: true,
-        ),
-      );
-    } else {
-      read(instructionState(
-                  "${whitespaceTile.position.x}-${whitespaceTile.position.y}")
-              .notifier)
-          .state = "NoHint";
+        state = state.copyWith(
+          tiles: state.tiles.map(
+            (e) {
+              if (e.compareOnlyPosition(t)) {
+                return e.copyWith(
+                  position: e.position.copyWith(
+                    showHint: true,
+                  ),
+                );
+              }
+              return e;
+            },
+          ).toList(),
+        );
+        read(positionTileProvider(
+          "${t.position.x}-${t.position.y}",
+        ).notifier)
+            .state = t.copyWith(
+          position: t.position.copyWith(
+            showHint: true,
+          ),
+        );
+        read(hintCountProvider.notifier).state++;
+      } else {
+        read(instructionState(
+                    "${whitespaceTile.position.x}-${whitespaceTile.position.y}")
+                .notifier)
+            .state = "NoHint";
+      }
+      read(beginCoolDown.notifier).state = true;
     }
   }
 
