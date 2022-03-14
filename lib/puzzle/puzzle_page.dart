@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/l10n/l10n.dart';
@@ -8,6 +9,7 @@ import 'package:mineswiper/puzzle/widgets/mine_count.dart';
 import 'package:mineswiper/puzzle/widgets/mine_lost.dart';
 import 'package:mineswiper/puzzle/widgets/mine_timer.dart';
 import 'package:mineswiper/utils/theme.dart';
+import 'package:rive/rive.dart';
 import 'package:throttling/throttling.dart';
 
 class PuzzlePage extends StatelessWidget {
@@ -28,10 +30,13 @@ class PuzzleView extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: context.theme.backgroundColor,
       appBar: AppBar(
-        title: const MineTimer(),
-        actions: const [
-          MineCount(),
-        ],
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const MineCount(),
+            const MineTimer(),
+          ],
+        ),
         centerTitle: true,
         elevation: 0,
       ),
@@ -50,6 +55,10 @@ class FAB extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final created =
         ref.watch(puzzleProvider.select((value) => value.whiteSpaceCreated));
+    final streamSnapshot = ref.watch(
+      coolDownTime,
+    );
+
     return created
         ? FloatingActionButton(
             onPressed: () {
@@ -59,9 +68,39 @@ class FAB extends HookConsumerWidget {
             focusElevation: 0,
             hoverElevation: 0,
             backgroundColor: context.theme.primaryColor,
-            child: Icon(
-              Icons.lightbulb_rounded,
-              color: context.theme.backgroundColor,
+            child: streamSnapshot.when(
+              data: (data) {
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (data <= 50)
+                      SizedBox.expand(
+                        child: CircularProgressIndicator(
+                          value: data / 50,
+                          strokeWidth: 3,
+                          color: context.theme.cardColor,
+                        ),
+                      ),
+                    if (data <= 50)
+                      Text(
+                        "${5 - data ~/ 10}",
+                        style: context.theme.textTheme.headline5!.copyWith(
+                          color: context.theme.backgroundColor,
+                        ),
+                      )
+                    else
+                      Icon(
+                        Icons.lightbulb_rounded,
+                        color: context.theme.backgroundColor,
+                      )
+                  ],
+                );
+              },
+              error: (_, __) => SizedBox(),
+              loading: () => Icon(
+                Icons.lightbulb_rounded,
+                color: context.theme.backgroundColor,
+              ),
             ),
           )
         : SizedBox();
@@ -196,8 +235,12 @@ class _ShowMessage extends HookConsumerWidget {
     final size = ref.read(puzzleSizeProvider);
     final l10n = context.l10n;
 
+    final RiveAnimationController _controller = SimpleAnimation('slowDance');
+
     Widget getMessage() {
       if (puzzleStateFailed) {
+        _controller.isActive = false;
+        HapticFeedback.mediumImpact();
         return Container(
           color: context.theme.backgroundColor,
           child: Column(
@@ -224,21 +267,64 @@ class _ShowMessage extends HookConsumerWidget {
                 onPressed: () {
                   ref.read(puzzleProvider.notifier).createPuzzle(size);
                 },
-                child: Text("Play again"),
+                child: Text(l10n.playAgain),
               ),
             ],
           ),
         );
       } else if (remainingTiles == 0) {
+        HapticFeedback.lightImpact();
         ref.read(puzzleEndTimeProvider.notifier).state =
             DateTime.now().millisecondsSinceEpoch;
-        return Chip(
-          label: Text(
-            l10n.won,
-            textAlign: TextAlign.center,
+
+        _controller.isActive = true;
+
+        _controller.isActive = true;
+
+        final int totalTime =
+            ref.read(puzzleEndTimeProvider) - ref.read(puzzleStartTimeProvider);
+
+        return Container(
+          color: context.theme.backgroundColor,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 300,
+                width: 300,
+                child: RiveAnimation.asset(
+                  'assets/rive/birb.riv',
+                  fit: BoxFit.contain,
+                  animations: ['slowDance'],
+                ),
+              ),
+              Text(
+                l10n.completed,
+                textAlign: TextAlign.center,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextButton(
+                  onPressed: () {
+                    ref.read(puzzleProvider.notifier).createPuzzle(size);
+                  },
+                  child: Text(l10n.playAgain),
+                ),
+              ),
+            ],
           ),
         );
+
+        // return Chip(
+        //   label: Text(
+        //     l10n.won,
+        //     textAlign: TextAlign.center,
+        //   ),
+        // );
       } else if (!whiteSpaceCreated) {
+        _controller.isActive = false;
         return Chip(
           label: Text(
             l10n.tapTile,
@@ -246,6 +332,7 @@ class _ShowMessage extends HookConsumerWidget {
           ),
         );
       } else {
+        _controller.isActive = false;
         return SizedBox();
       }
     }

@@ -53,7 +53,7 @@ abstract class PuzzleColors {
   /// White
   static const Color white = Color(0xFFFFFFFF);
 
-  static const Color green = Color(0xFF00FF00);
+  static const Color green = Color(0xFF11FF77);
 
   static const Color tileText = Color(0xFF90CA99);
 }

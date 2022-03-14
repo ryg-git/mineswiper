@@ -29,7 +29,8 @@
     "@over": {
         "description": "Game Over"
     },
+    "playAgain": "Play Again?",
     "mineLost": "You opened the tile that had mine below it",
     "flagLost": "You wrongly flagged a safe tile",
-    "completed": "You visited all the tiles in: "
+    "completed": "Congratulations! you visited all tiles!"
 }
