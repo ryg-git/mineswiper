@@ -20,6 +20,7 @@ class Puzzle with _$Puzzle {
     @Default(false) bool solved,
     @Default(false) bool failed,
     @Default(0) int reset,
+    @Default("") String lossReason,
   }) = _Puzzle;
 
   int getDimension() {

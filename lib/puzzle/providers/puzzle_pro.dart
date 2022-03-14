@@ -274,6 +274,24 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
       final whitespaceTile = getWhitespaceTile();
       if (event.logicalKey == LogicalKeyboardKey.keyF) {
         autoFlagTile(whitespaceTile);
+      } else if (event.logicalKey == LogicalKeyboardKey.keyH) {
+        showHint();
+      } else if (event.logicalKey == LogicalKeyboardKey.keyW) {
+        final t =
+            state.tiles.firstWhere((element) => whitespaceTile.onTop(element));
+        flagTile(t);
+      } else if (event.logicalKey == LogicalKeyboardKey.keyA) {
+        final t =
+            state.tiles.firstWhere((element) => whitespaceTile.onLeft(element));
+        flagTile(t);
+      } else if (event.logicalKey == LogicalKeyboardKey.keyS) {
+        final t = state.tiles
+            .firstWhere((element) => whitespaceTile.onBottom(element));
+        flagTile(t);
+      } else if (event.logicalKey == LogicalKeyboardKey.keyD) {
+        final t = state.tiles
+            .firstWhere((element) => whitespaceTile.onRight(element));
+        flagTile(t);
       } else if (event.data.logicalKey.keyLabel == "Arrow Left") {
         final t =
             state.tiles.firstWhere((element) => element.onLeft(whitespaceTile));
@@ -424,13 +442,19 @@ class PuzzleNotifier extends StateNotifier<Puzzle> {
         } else {
           state = state.copyWith(
             failed: true,
+            lossReason: "mine",
           );
+          read(puzzleEndTimeProvider.notifier).state =
+              DateTime.now().millisecondsSinceEpoch;
         }
       } else if (tile.position.isFlagged) {
         if (!tile.position.isMine) {
           state = state.copyWith(
             failed: true,
+            lossReason: "flag",
           );
+          read(puzzleEndTimeProvider.notifier).state =
+              DateTime.now().millisecondsSinceEpoch;
         }
       } else {
         if (!state.tiles[tileIndex].position.isVisited) {
