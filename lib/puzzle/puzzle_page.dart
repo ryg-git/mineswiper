@@ -30,6 +30,7 @@ class PuzzleView extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: context.theme.backgroundColor,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -37,6 +38,12 @@ class PuzzleView extends HookConsumerWidget {
             const MineTimer(),
           ],
         ),
+        actions: [
+          TextButton(
+            child: Text("Back"),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
         centerTitle: true,
         elevation: 0,
       ),
@@ -154,6 +161,7 @@ class PuzzleBoard extends HookConsumerWidget {
           !ref.read(puzzleStateProvider).puzzle.failed) {
         ref.read(puzzleProvider.notifier).handleKeyEvent(event);
       }
+      _focusNode.requestFocus();
     }
 
     if (size == 0)
@@ -278,11 +286,6 @@ class _ShowMessage extends HookConsumerWidget {
             DateTime.now().millisecondsSinceEpoch;
 
         _controller.isActive = true;
-
-        _controller.isActive = true;
-
-        final int totalTime =
-            ref.read(puzzleEndTimeProvider) - ref.read(puzzleStartTimeProvider);
 
         return Container(
           color: context.theme.backgroundColor,

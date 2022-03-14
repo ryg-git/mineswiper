@@ -12,6 +12,8 @@ class MineCount extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mines = ref.watch(mineCountProvider);
+    final created =
+        ref.watch(puzzleProvider.select((value) => value.whiteSpaceCreated));
     final animationController = useAnimationController(
       duration: Duration(
         milliseconds: 300,
@@ -54,26 +56,28 @@ class MineCount extends HookConsumerWidget {
                     color: context.theme.primaryColor,
                   ),
                 ),
-                Stack(
-                  children: [
-                    if (pre != 0)
-                      Transform.translate(
-                        offset: _animOffsetUp.value,
-                        child: Text(
-                          '${mines + 1}',
-                          textAlign: TextAlign.center,
+                if (created)
+                  Stack(
+                    children: [
+                      if (pre != 0)
+                        Transform.translate(
+                          offset: _animOffsetUp.value,
+                          child: Text(
+                            '${mines + 1}',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                    if (mines >= 0)
-                      Transform.translate(
-                        offset: _animOffsetDown.value,
-                        child: Text(
-                          '$mines',
-                          textAlign: TextAlign.center,
+                      if (mines >= 0)
+                        Transform.translate(
+                          offset: _animOffsetDown.value,
+                          child: Text(
+                            '$mines',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                  ],
-                ),
+                    ],
+                  ),
+                if (!created) Text("-"),
               ],
             );
           },

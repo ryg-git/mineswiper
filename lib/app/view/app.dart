@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/l10n/l10n.dart';
-import 'package:mineswiper/puzzle/puzzle_page.dart';
+import 'package:mineswiper/menu/menu.dart';
 import 'package:mineswiper/theme/app_theme.dart';
 
 final darkThemeState = StateProvider((ref) => false);
@@ -32,7 +32,7 @@ class App extends HookConsumerWidget {
         },
       ),
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const PuzzlePage(),
+      home: Menu(),
     );
   }
 }
