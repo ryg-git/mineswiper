@@ -8,14 +8,17 @@ import 'package:mineswiper/theme/app_theme.dart';
 
 final darkThemeState = StateProvider((ref) => false);
 
+final appThemeState = StateProvider((ref) => AppTheme.lightTheme);
+
 class App extends HookConsumerWidget {
   const App({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final darkMode = ref.watch(darkThemeState);
+    final appTheme = ref.watch(appThemeState);
     return MaterialApp(
-      theme: AppTheme.lightTheme,
+      theme: appTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: darkMode ? ThemeMode.dark : ThemeMode.light,
       debugShowCheckedModeBanner: false,
