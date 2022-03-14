@@ -117,38 +117,40 @@ class PuzzleBoard extends HookConsumerWidget {
       }
     }
 
-    if (size == 0) return const CircularProgressIndicator();
-    return InteractiveViewer(
-      onInteractionEnd: (details) =>
-          FocusScope.of(context).requestFocus(_focusNode),
-      panEnabled: true,
-      boundaryMargin: EdgeInsets.all(10),
-      minScale: 1,
-      maxScale: 8,
-      child: RawKeyboardListener(
-        focusNode: _focusNode,
-        onKey: (event) => thr.throttle(() => _handleKeyEvent(event)),
-        autofocus: true,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            puzzleLayout.boardBuilder(
-              size,
-              puzzleState.puzzle.tiles
-                  .map(
-                    (tile) => _PuzzleTile(
-                      key: Key('puzzle_tile_${tile.position.toString()}'),
-                      x: tile.position.x,
-                      y: tile.position.y,
-                    ),
-                  )
-                  .toList(),
-            ),
-            _ShowMessage(),
-          ],
+    if (size == 0)
+      return const Center(child: CircularProgressIndicator());
+    else
+      return InteractiveViewer(
+        onInteractionEnd: (details) =>
+            FocusScope.of(context).requestFocus(_focusNode),
+        panEnabled: true,
+        boundaryMargin: EdgeInsets.all(10),
+        minScale: 1,
+        maxScale: 8,
+        child: RawKeyboardListener(
+          focusNode: _focusNode,
+          onKey: (event) => thr.throttle(() => _handleKeyEvent(event)),
+          autofocus: true,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              puzzleLayout.boardBuilder(
+                size,
+                puzzleState.puzzle.tiles
+                    .map(
+                      (tile) => _PuzzleTile(
+                        key: Key('puzzle_tile_${tile.position.toString()}'),
+                        x: tile.position.x,
+                        y: tile.position.y,
+                      ),
+                    )
+                    .toList(),
+              ),
+              _ShowMessage(),
+            ],
+          ),
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -191,6 +193,7 @@ class _ShowMessage extends HookConsumerWidget {
     final whiteSpaceCreated = ref.watch(
         puzzleStateProvider.select((value) => value.puzzle.whiteSpaceCreated));
     final remainingTiles = ref.watch(remainingProvider);
+    final size = ref.read(puzzleSizeProvider);
     final l10n = context.l10n;
 
     Widget getMessage() {
@@ -216,6 +219,12 @@ class _ShowMessage extends HookConsumerWidget {
                   textAlign: TextAlign.center,
                   style: context.theme.textTheme.bodySmall,
                 ),
+              ),
+              TextButton(
+                onPressed: () {
+                  ref.read(puzzleProvider.notifier).createPuzzle(size);
+                },
+                child: Text("Play again"),
               ),
             ],
           ),
