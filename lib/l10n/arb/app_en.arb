@@ -24,5 +24,12 @@
     "reset": "Reset",
     "@reset": {
         "description": "Reset puzzle"
-    }
+    },
+    "over": "Game Over",
+    "@over": {
+        "description": "Game Over"
+    },
+    "mineLost": "You opened the tile that had mine below it",
+    "flagLost": "You wrongly flagged a safe tile",
+    "completed": "You visited all the tiles in: "
 }

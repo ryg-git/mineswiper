@@ -3,7 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mineswiper/l10n/l10n.dart';
 import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
+import 'package:mineswiper/puzzle/widgets/flag_lost.dart';
 import 'package:mineswiper/puzzle/widgets/mine_count.dart';
+import 'package:mineswiper/puzzle/widgets/mine_lost.dart';
 import 'package:mineswiper/puzzle/widgets/mine_timer.dart';
 import 'package:mineswiper/utils/theme.dart';
 import 'package:throttling/throttling.dart';
@@ -18,30 +20,51 @@ class PuzzlePage extends StatelessWidget {
   }
 }
 
-class PuzzleView extends StatelessWidget {
-  /// {@macro puzzle_view}
+class PuzzleView extends HookConsumerWidget {
   const PuzzleView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: context.theme.backgroundColor,
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: const [
-            MineTimer(),
-            MineCount(),
-          ],
-        ),
+        title: const MineTimer(),
+        actions: const [
+          MineCount(),
+        ],
         centerTitle: true,
         elevation: 0,
       ),
       body: const _Puzzle(
         key: Key('puzzle_view_puzzle'),
       ),
+      floatingActionButton: FAB(),
     );
+  }
+}
+
+class FAB extends HookConsumerWidget {
+  const FAB({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final created =
+        ref.watch(puzzleProvider.select((value) => value.whiteSpaceCreated));
+    return created
+        ? FloatingActionButton(
+            onPressed: () {
+              ref.read(puzzleProvider.notifier).showHint();
+            },
+            elevation: 0,
+            focusElevation: 0,
+            hoverElevation: 0,
+            backgroundColor: context.theme.primaryColor,
+            child: Icon(
+              Icons.lightbulb_rounded,
+              color: context.theme.backgroundColor,
+            ),
+          )
+        : SizedBox();
   }
 }
 
@@ -163,6 +186,8 @@ class _ShowMessage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final puzzleStateFailed =
         ref.watch(puzzleStateProvider.select((value) => value.puzzle.failed));
+    final lossReason = ref
+        .watch(puzzleStateProvider.select((value) => value.puzzle.lossReason));
     final whiteSpaceCreated = ref.watch(
         puzzleStateProvider.select((value) => value.puzzle.whiteSpaceCreated));
     final remainingTiles = ref.watch(remainingProvider);
@@ -170,13 +195,34 @@ class _ShowMessage extends HookConsumerWidget {
 
     Widget getMessage() {
       if (puzzleStateFailed) {
-        return Chip(
-          label: Text(
-            l10n.lost,
-            textAlign: TextAlign.center,
+        return Container(
+          color: context.theme.backgroundColor,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.over,
+                textAlign: TextAlign.center,
+                style: context.theme.textTheme.subtitle1,
+              ),
+              if (lossReason == "mine") const MineLost(),
+              if (lossReason == "flag") const FlagLost(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  lossReason == "mine" ? l10n.mineLost : l10n.flagLost,
+                  textAlign: TextAlign.center,
+                  style: context.theme.textTheme.bodySmall,
+                ),
+              ),
+            ],
           ),
         );
       } else if (remainingTiles == 0) {
+        ref.read(puzzleEndTimeProvider.notifier).state =
+            DateTime.now().millisecondsSinceEpoch;
         return Chip(
           label: Text(
             l10n.won,
