@@ -63,15 +63,22 @@ class MinePuzzleTile extends HookConsumerWidget {
       if (tile.position.isVisited) {
         if (tile.position.isMine) {
           return Text(
-            'M',
+            '0',
             style: TextStyle(
-              color: context.theme.primaryColor,
+              color: PuzzleColors.green,
+              fontFamily: "FredokaOne",
+              fontSize: tileFontSize * 5 / size,
             ),
           );
         } else {
           return Text(
             '${tile.position.mines}',
             textAlign: TextAlign.center,
+            style: PuzzleTextStyle.headline2.copyWith(
+              fontSize: tileFontSize * 5 / size,
+              fontFamily: "FredokaOne",
+              color: context.theme.backgroundColor,
+            ),
           );
         }
       } else {

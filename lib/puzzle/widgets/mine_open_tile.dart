@@ -8,6 +8,8 @@ import 'package:mineswiper/puzzle/providers/puzzle_pro.dart';
 import 'package:mineswiper/styles/text_styles.dart';
 import 'dart:math' show pi, sin;
 
+import 'package:mineswiper/utils/theme.dart';
+
 class MineOpenTile extends HookConsumerWidget {
   /// {@macro simple_puzzle_tile}
   const MineOpenTile({
@@ -64,22 +66,90 @@ class MineOpenTile extends HookConsumerWidget {
       },
     );
 
+    final changeIcon = useState(false);
+
     Widget getLetter() {
-      if (tile.position.isMine) {
-        return Text(
-          'M',
-          style: PuzzleTextStyle.headline2.copyWith(
-            fontSize: tileFontSize * 2 / size,
-            color: PuzzleColors.white,
-          ),
+      if (tile.position.isFlagged) {
+        if (tile.position.isMine) {
+          Future.delayed(
+            Duration(milliseconds: 500),
+            () => changeIcon.value = true,
+          );
+          return AnimatedSwitcher(
+            transitionBuilder: (child, animation) {
+              return ScaleTransition(
+                scale: animation,
+                child: child,
+              );
+            },
+            duration: Duration(milliseconds: 500),
+            child: changeIcon.value
+                ? Text(
+                    "0",
+                    style: TextStyle(
+                      color: PuzzleColors.white,
+                      fontFamily: "FredokaOne",
+                      fontSize: tileFontSize * 5 / size,
+                    ),
+                  )
+                : Icon(
+                    Icons.check_circle,
+                    color: PuzzleColors.green,
+                  ),
+          );
+        } else {
+          Future.delayed(
+            Duration(milliseconds: 500),
+            () => changeIcon.value = true,
+          );
+          return AnimatedSwitcher(
+            transitionBuilder: (child, animation) {
+              return ScaleTransition(
+                scale: animation,
+                child: child,
+              );
+            },
+            duration: Duration(milliseconds: 500),
+            child: changeIcon.value
+                ? Text(
+                    '${tile.position.mines}',
+                    style: PuzzleTextStyle.headline2.copyWith(
+                      fontSize: tileFontSize * 5 / size,
+                      fontFamily: "FredokaOne",
+                      color: Colors.red,
+                    ),
+                    textAlign: TextAlign.center,
+                  )
+                : Icon(
+                    Icons.close,
+                    color: Colors.red,
+                  ),
+          );
+        }
+      } else if (tile.position.isMine) {
+        Future.delayed(
+          Duration(milliseconds: 500),
+          () => changeIcon.value = true,
         );
-      } else if (tile.position.isFlagged) {
-        return Text(
-          '${tile.position.mines}',
-          style: PuzzleTextStyle.headline2.copyWith(
-            fontSize: tileFontSize * 2 / size,
-            color: PuzzleColors.white,
-          ),
+        return AnimatedSwitcher(
+          transitionBuilder: (child, animation) {
+            return ScaleTransition(
+              scale: animation,
+              child: child,
+            );
+          },
+          duration: Duration(milliseconds: 500),
+          child: changeIcon.value
+              ? Image(
+                  image: AssetImage('assets/images/mine.png'),
+                  fit: BoxFit.fitHeight,
+                  height: 30,
+                  color: Colors.red,
+                )
+              : Icon(
+                  Icons.close,
+                  color: Colors.red,
+                ),
         );
       } else {
         return Align(
@@ -87,8 +157,9 @@ class MineOpenTile extends HookConsumerWidget {
           child: Text(
             '${tile.position.mines}',
             style: PuzzleTextStyle.headline2.copyWith(
-              fontSize: tileFontSize * 2 / size,
-              color: PuzzleColors.white,
+              fontSize: tileFontSize * 5 / size,
+              color: context.theme.primaryColor,
+              fontFamily: "FredokaOne",
             ),
             textAlign: TextAlign.center,
           ),
